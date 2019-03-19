@@ -2,7 +2,7 @@ const { PubSub, withFilter } = require('apollo-server');
 
 import {
   user
-} from '../database';
+} from '../../database';
 
 const { 
   insertUser,

@@ -1,6 +1,6 @@
 import {
   user
-} from '../database';
+} from '../../database';
 
 const { 
   selectUserById,
