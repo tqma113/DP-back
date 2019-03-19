@@ -8,8 +8,8 @@ import http from 'http'
 
 const configurations = {
   // Note: You may need sudo to run on port 443
-  production: { ssl: true, port: 443, hostname: 'example.com' },
-  development: { ssl: true, port: 4000, hostname: 'localhost' }
+  development: { ssl: false, port: 4000, hostname: 'localhost' },
+  production: { ssl: true, port: 443, hostname: 'www.matianqi.com' }
 }
 
 const environment = process.env.NODE_ENV || 'production'
