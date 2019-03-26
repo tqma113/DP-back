@@ -13,21 +13,53 @@ const createNewToken = () => {
   return token
 }
 
-export default {
-  create: (username) => {
-    let token = createNewToken();
+const isAvailable = (sessionInfo) => sessionInfo.token &&
+                          sessionInfo.expira &&
+                          +sessionInfo.expira > (new Date().getTime())
 
-    redis.set(username, {
+const accessToken = {
+  create: (username) => {
+    const token = createNewToken();
+    const sessionInfo = {
       token,
       expira: (new Date()).getTime() + REFRESH_TOKEN_TIME
-    })
+    }
+
+    redis.set(username, sessionInfo)
 
     return token
   },
   refresh: (username) => {
-
+    this.delete(username)
+    return this.create(username)
   },
-  delete: () => {
+  delete: (username) => {
+    redis.delete(username)
+  },
+  check: (username, token) => {
+    if (redis.exists(username)) {
+      const sessionInfo = redis.get(username)
+      return isAvailable(sessionInfo)
+    } else {
+      return false
+    }
+  },
+  clear: (num) => {
+    const check = (username, value) => {
+      let arr = value.split('|')
+      const sessionInfo = {
+        token: arr[0],
+        expira: +arr[1]
+      }
+      return isAvailable(sessionInfo)
+    }
 
+    const count = redis.clear(num, check)
+
+    if (count > num/4) {
+      clear(num)
+    }
   }
 }
+
+export default accessToken
