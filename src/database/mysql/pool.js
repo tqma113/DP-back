@@ -13,12 +13,14 @@ const pool = mysql.createPool({
 })
 
 pool.on('acquire', function (connection) {
-  console.log('Connection %d acquired', connection.threadId);
+  console.log('[MySQL] Connection %d acquired', connection.threadId);
 });
 
 pool.on('connection', function (connection) {
   connection.query('SET SESSION auto_increment_increment=1')
-  console.log('Connection %d connected!', connection.threadId)
+  console.log('[MySQL] Connection %d connected!', connection.threadId)
 });
+
+console.log('[MySQL] Pool connected!')
 
 export default pool

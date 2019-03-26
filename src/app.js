@@ -66,7 +66,7 @@ apollo.installSubscriptionHandlers(server)
 
 server.listen({ port: config.port }, () =>
   console.log(
-    'Server ready at',
+    '[Main] Server ready at',
     `http${config.ssl ? 's' : ''}://${config.hostname}:${config.port}${apollo.graphqlPath}`
   )
 )

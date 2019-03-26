@@ -4,7 +4,7 @@ import assert from 'assert'
 const client = redis.createClient()
 
 client.on('ready', function () {
-  console.log('Redis connected!')
+  console.log('[Redis] Redis connected!')
 })
 
 client.on('error', function (err) {
