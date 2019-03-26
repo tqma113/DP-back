@@ -32,7 +32,7 @@ const clear = (num, check) => {
     let key = client.randomkey()
     let value = get(key)
     
-    if (!check(key, value)) {
+    if (!check(value)) {
       deleteKey(key)
       count++
     }

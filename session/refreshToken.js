@@ -1,6 +1,7 @@
 import redis from '../redis'
 
 const REFRESH_TOKEN_TIME = 20*60*1000;
+const PREFIX = 'RT_'
 
 const createNewToken = () => {
   const all = 'QWERTYUIOPASDFGHJKLZXCVBNM1234567890'
@@ -25,7 +26,7 @@ const accessToken = {
       expira: (new Date()).getTime() + REFRESH_TOKEN_TIME
     }
 
-    redis.set(username, sessionInfo)
+    redis.set(PREFIX + username, sessionInfo)
 
     return token
   },
@@ -34,18 +35,18 @@ const accessToken = {
     return this.create(username)
   },
   delete: (username) => {
-    redis.delete(username)
+    redis.delete(PREFIX + username)
   },
   check: (username, token) => {
-    if (redis.exists(username)) {
-      const sessionInfo = redis.get(username)
-      return isAvailable(sessionInfo)
+    if (redis.exists(PREFIX + username)) {
+      const sessionInfo = redis.get(PREFIX + username)
+      return isAvailable(sessionInfo) && sessionInfo.expira === token
     } else {
       return false
     }
   },
   clear: (num) => {
-    const check = (username, value) => {
+    const check = (value) => {
       let arr = value.split('|')
       const sessionInfo = {
         token: arr[0],
