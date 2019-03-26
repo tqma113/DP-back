@@ -11,6 +11,8 @@ type Mutation {
   createUser(name: String!, address: String!): User!
   deleteUser(id: ID!): User!
   updateUser(id: ID!, key: String!, value: String!): User!
+  
+  login(username: String!, password: String!): SessionInfo!
 }
 
 type Subscription {
@@ -27,6 +29,12 @@ type User {
   gender: Boolean!
   degree: Degree!
   create_at: Date!
+}
+
+type SessionInfo {
+  success: Boolean!
+  username: String!
+  token: String!
 }
 
 enum Degree {

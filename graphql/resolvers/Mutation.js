@@ -31,5 +31,12 @@ export default {
     const user = await updateUserById(id, key, value);
     pubsub.publish(USER_UPDATED, { user });
     return user;
+  },
+  login: async (root, { username, password }, context, info) => {
+    return {
+      success: true,
+      token: 'adfadfs',
+      username
+    }
   }
 }

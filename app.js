@@ -6,6 +6,8 @@ import fs from 'fs'
 import https from 'https'
 import http from 'http'
 
+import session from './session'
+
 const configurations = {
   // Note: You may need sudo to run on port 443
   development: { ssl: false, port: 4000, hostname: 'localhost' },
@@ -15,7 +17,30 @@ const configurations = {
 const environment = process.env.NODE_ENV || 'production'
 const config = configurations[environment]
 
-const apollo = new ApolloServer({ typeDefs, resolvers })
+const apollo = new ApolloServer({ 
+  typeDefs, 
+  resolvers,
+  tracing: true,
+  cacheControl: {
+    // defaultMaxAge: 5,
+    // stripFormattedExtensions: false,
+    // calculateCacheControlHeaders: false,
+  },
+  introspection: true,
+  playground: true,
+  formatError: error => {
+    console.log(error);
+    return error;
+  },
+  formatResponse: response => {
+    console.log(response);
+    return response;
+  },
+  context: ({ req }) => {
+    const token = req.headers.authorization || '';
+    console.log(token)
+  }
+})
 
 const app = express()
 apollo.applyMiddleware({ app })
@@ -41,7 +66,7 @@ apollo.installSubscriptionHandlers(server)
 
 server.listen({ port: config.port }, () =>
   console.log(
-    '🚀 Server ready at',
+    'Server ready at',
     `http${config.ssl ? 's' : ''}://${config.hostname}:${config.port}${apollo.graphqlPath}`
   )
 )
