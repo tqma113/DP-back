@@ -13,6 +13,8 @@ type Mutation {
   updateUser(id: ID!, key: String!, value: String!): User!
   
   login(username: String!, password: String!): SessionInfo!
+
+  upload(files: Upload!): [UploadInfo]!
 }
 
 type Subscription {
@@ -35,6 +37,12 @@ type SessionInfo {
   success: Boolean!
   username: String!
   token: String!
+}
+
+type UploadInfo {
+  filename: String!
+  success: Boolean!
+  extension: String!
 }
 
 enum Degree {

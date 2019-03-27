@@ -38,5 +38,29 @@ export default {
       token: 'adfadfs',
       username
     }
-  }
+  },
+  upload: async (root, { files }, context, info) => {
+    let uploadInfos = []
+
+    for (let file of files) {
+      const { stream, filename, mimetype, encoding } = await file;
+      let uploadInfo = {
+        filename,
+        success: true,
+        extension: ''
+      }
+
+      try {
+        // TODO file storage
+        
+      } catch (err) {
+        uploadInfo.success = false
+        uploadInfo.extension = JSON.stringify(err)
+      }
+
+      uploadInfos.push(uploadInfo)
+    }
+
+    return uploadInfos
+  },
 }
