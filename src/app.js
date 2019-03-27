@@ -5,6 +5,7 @@ import resolvers from './graphql/resolvers'
 import fs from 'fs'
 import https from 'https'
 import http from 'http'
+import cors from'cors'
 
 import session from './session'
 
@@ -20,6 +21,21 @@ const config = configurations[environment]
 const apollo = new ApolloServer({ 
   typeDefs, 
   resolvers,
+  subscriptions: {
+    onConnect: (connectionParams, webSocket) => {
+      if (connectionParams.authToken) {
+        return validateToken(connectionParams.authToken)
+          .then(findUser(connectionParams.authToken))
+          .then(user => {
+            return {
+              currentUser: user,
+            };
+          });
+      }
+
+      throw new Error('Missing auth token!');
+    },
+  },
   tracing: true,
   cacheControl: {
     // defaultMaxAge: 5,
@@ -43,6 +59,15 @@ const apollo = new ApolloServer({
 })
 
 const app = express()
+
+const corsOptions = {
+  origin: 'https://localhost:3000',
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true
+}
+
+app.use(cors(corsOptions));
+
 apollo.applyMiddleware({ app })
 
 // Create the HTTPS or HTTP server, per configuration
@@ -64,9 +89,10 @@ if (config.ssl) {
 // Add subscription support
 apollo.installSubscriptionHandlers(server)
 
-server.listen({ port: config.port }, () =>
+server.listen({ port: config.port }, () => {
   console.log(
     '[Main] Server ready at',
     `http${config.ssl ? 's' : ''}://${config.hostname}:${config.port}${apollo.graphqlPath}`
   )
-)
+  console.log(`[Main] Subscriptions ready at ws${config.ssl ? 's' : ''}://${config.hostname}:${config.port}${apollo.subscriptionsPath}`)
+})
