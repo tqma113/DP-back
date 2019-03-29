@@ -5,7 +5,7 @@ import resolvers from './graphql/resolvers'
 import fs from 'fs'
 import https from 'https'
 import http from 'http'
-import cors from'cors'
+// import cors from'cors'
 import multer from 'multer'
 
 import session from './session'
@@ -35,23 +35,26 @@ const apollo = new ApolloServer({
   resolvers,
   subscriptions: {
     path: '/subscriptions',
-    keepAlive: 20,
+    // keepAlive: 20,
     onConnect: (connectionParams, webSocket) => {
-      if (connectionParams.authToken) {
-        return validateToken(connectionParams.authToken)
-          .then(findUser(connectionParams.authToken))
-          .then(user => {
-            return {
-              currentUser: user,
-            };
-          });
-      }
+      // TODO GraphQL鉴权还是逻辑中健全?
 
-      throw new Error('Missing auth token!');
+      // GraphQL鉴权
+      // if (connectionParams.authToken) {
+      //   return validateToken(connectionParams.authToken)
+      //     .then(findUser(connectionParams.authToken))
+      //     .then(user => {
+      //       return {
+      //         currentUser: user,
+      //       };
+      //     });
+      // }
+
+      // throw new Error('Missing auth token!');
     },
-    onDisconnect: (...arg) => {
+    onDisconnect: (webSocket, initPromise) => {
       // TODO
-      // console.log(arg)
+      
     }
   },
   tracing: true,
@@ -97,37 +100,37 @@ const app = express()
 // // 支持跨域
 // app.use(cors(corsOptions));
 
-// var createFolder = function(folder){
-//   try{
-//       fs.accessSync(folder); 
-//   }catch(e){
-//       fs.mkdirSync(folder);
-//   }  
-// };
+var createFolder = function(folder){
+  try{
+      fs.accessSync(folder); 
+  }catch(e){
+      fs.mkdirSync(folder);
+  }  
+};
 
-// var uploadFolder = './upload/';
+var uploadFolder = './upload/';
 
-// createFolder(uploadFolder);
+createFolder(uploadFolder);
 
-// // 通过 filename 属性定制
-// var storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//       cb(null, uploadFolder);    // 保存的路径，备注：需要自己创建
-//   },
-//   filename: function (req, file, cb) {
-//       // 将保存文件名设置为 字段名 + 时间戳，比如 logo-1478521468943
-//       cb(null, file.fieldname + '-' + Date.now());  
-//   }
-// });
+// 通过 filename 属性定制
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+      cb(null, uploadFolder);    // 保存的路径，备注：需要自己创建
+  },
+  filename: function (req, file, cb) {
+      // 将保存文件名设置为 字段名 + 时间戳，比如 logo-1478521468943
+      cb(null, file.fieldname + '-' + Date.now());  
+  }
+});
 
-// // 通过 storage 选项来对 上传行为 进行定制化
-// var upload = multer({ storage: storage })
+// 通过 storage 选项来对 上传行为 进行定制化
+var upload = multer({ storage: storage })
 
-// // 单图上传
-// app.post('/upload', upload.single('logo'), function(req, res, next){
-//   var file = req.file;
-//   res.send({ret_code: '0'});
-// });
+// 单图上传
+app.post('/upload', upload.single('logo'), function(req, res, next){
+  var file = req.file;
+  res.send({ret_code: '0'});
+});
 
 apollo.applyMiddleware({ app })
 
