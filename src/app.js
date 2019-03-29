@@ -50,16 +50,19 @@ const apollo = new ApolloServer({
   introspection: true,
   playground: true,
   formatError: error => {
-    console.log(error);
+    // TODO Error handle
+    // console.log(error);
     return error;
   },
   formatResponse: response => {
-    console.log(response);
+    // TODO Something need to do
+    // console.log(response);
     return response;
   },
   context: ({ req }) => {
-    const token = req.headers.authorization || '';
-    console.log(token)
+    // TODO 
+    // console.log(Object.keys(req))
+    // console.log(req.body)
   },
   dataSources: () => {
     return {
