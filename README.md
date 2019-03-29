@@ -6,3 +6,5 @@ nodemailer 实现邮箱验证
 mysql 部署
 
 redis 部署
+
+缓存方案: dataloader/apollo-server-cache-memcached  (可选)

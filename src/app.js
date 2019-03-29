@@ -10,6 +10,10 @@ import multer from 'multer'
 
 import session from './session'
 
+import {
+  user
+} from './database';
+
 const configurations = {
   // Note: You may need sudo to run on port 443
   development: { ssl: false, port: 4000, hostname: 'localhost' },
@@ -56,6 +60,11 @@ const apollo = new ApolloServer({
   context: ({ req }) => {
     const token = req.headers.authorization || '';
     console.log(token)
+  },
+  dataSources: () => {
+    return {
+      user
+    }
   }
 })
 
@@ -112,8 +121,8 @@ if (config.ssl) {
   // are secured.
   server = https.createServer(
     {
-      key: fs.readFileSync(`./ssl/${environment}/server.key`),
-      cert: fs.readFileSync(`./ssl/${environment}/server.crt`)
+      key: fs.readFileSync(`./src/ssl/${environment}/server.key`),
+      cert: fs.readFileSync(`./src/ssl/${environment}/server.crt`)
     },
     app
   )

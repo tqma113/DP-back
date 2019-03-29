@@ -1,23 +1,11 @@
-import {
-  user
-} from '../../database';
-
-const { 
-  selectUserById,
-  insertUser,
-  selectUsers,
-  deleteUserById,
-  updateUserById
-} = user;
-
 export default {
-  user: async (root, { id }, context, info) => {
-    var users = await selectUserById(id);
-    var user = users[0] || {};
+  user: async (root, { id }, { dataSources }, info) => {
+    let users = await dataSources.user.selectUserById(id);
+    let user = users[0] || {};
     return user
   },
-  users: async (root, args, context, info) => {
-    const users = await selectUsers();
+  users: async (root, args, { dataSources }, info) => {
+    const users = await dataSources.user.selectUsers();
     return users
   }
 }
