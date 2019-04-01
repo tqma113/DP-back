@@ -5,7 +5,7 @@ const pool = mysql.createPool({
   user: 'root',
   password: 'mtq123',
   port: '3306',
-  database: 'graphql',
+  database: 'dp_blog',
   // charset: 'UTF8_GENERAL_CL',
   connectTimeout: 1000000,
   stringifyObjects: true,
