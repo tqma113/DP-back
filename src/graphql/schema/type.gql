@@ -1,0 +1,151 @@
+type User {
+  id: ID!
+  name: String!
+  address: String!
+  gender: Boolean!
+  birthday: Date!
+  industry: [Industry]!
+  register_at: Date!
+  last_login_at: Date!
+  hd_protrait: String!
+  statement: String!
+  mailbox: String!
+  eduBC: [EduBC]!
+  articles: [Article]!
+  categorys: [Category]!
+  concerned_categorys: [Category]!
+  concerned: [User]!
+  likes: [Article]!
+  collections: [Article]!
+  dynamics: [Dynamics]!
+}
+
+type EduBC {
+  school: String!
+  major: String!
+  degree: Degree!
+}
+
+type EmRecord {
+  company: String!
+  position: String!
+}
+
+type SecQuestion {
+  question: String!
+  answer: String!
+  user: User!
+}
+
+type Industry {
+  id: ID!
+  name: String!
+  description: String!
+  image: String!
+}
+
+type Category {
+  id: ID!
+  subject: String!
+  description: String!
+}
+
+type Article {
+  id: ID!
+  titile: String!
+  abstract: String!
+  content: String!
+  release_at: Date!
+  last_modify_at: Date!
+  user: User!
+  project_link: [String]!
+  categorys: [Category]!
+  industrys: [Industry]!
+  comments: [Comment]!
+  likes: Int!
+  collections: Int!
+}
+
+
+type Comment {
+  id: ID!
+  content: String!
+  user: User!
+  article: Article!
+  comments: [Comment]!
+  comment: Comment!
+  create_at: Date!
+  likes: Int!
+}
+
+type Message {
+  id: ID!
+  send_user: User!
+  accept_user: User!
+  content: String!
+  send_at: Date!
+}
+
+type SessionInfo {
+  username: String!
+  token: String!
+  isRefresh: Boolean!
+}
+
+type UploadInfo {
+  filename: String!
+  success: Boolean!
+  size: Int!
+  uri: String!
+}
+
+type Error {
+  path: String
+  message: String
+}
+
+type Extension {
+  operator: String!
+  errors: [Error]!
+}
+
+interface Response {
+  success: Boolean!
+  extension: Extension!
+}
+
+type Dynamics {
+  type: DynamcisType!
+  article: Article
+  comment: Comment
+  user: User
+  do_at: Date!
+}
+
+type AuthResponse implements Response {
+  sessionInfo: SessionInfo!
+  user: User!
+  success: Boolean!
+  extensions: Extension!
+}
+
+enum Degree {
+  BACHELOR
+  MASTER
+  DOCTOR
+  OTHER
+}
+
+enum DynamcisType {
+  ARTICLE_CREATE
+  ARTICLE_MODIFY
+  ARTICLE_LIKE
+  ARTICLE_COLLECT
+
+  COMMENT_CREATE
+  COMMENT_LIKE
+
+  USER_CONCERN
+}
+
+scalar Date

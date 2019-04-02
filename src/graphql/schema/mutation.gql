@@ -1,0 +1,11 @@
+type Mutation {
+  register(username: String!, 
+            nickname: String!, 
+            password: String!, 
+            hd_portrial: String!, 
+            gender: Int!, 
+            address: String!, 
+            birthday: Date!,
+            industry: [Industry]!,
+            mailbox: String!): AuthResponse!
+}

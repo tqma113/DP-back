@@ -1,11 +1,14 @@
 export default {
-  user: async (root, { id }, { dataSources }, info) => {
-    let users = await dataSources.user.selectUserById(id);
-    let user = users[0] || {};
-    return user
+  login: async (root, { username, password }, { dataSources }, info) => {
+    
+    return {
+
+    }
   },
-  users: async (root, args, { dataSources }, info) => {
-    const users = await dataSources.user.selectUsers();
-    return users
+  checkLoginState: async (root, { username, token }, { dataSources }, info) => {
+    
+    return {
+      
+    }
   }
 }

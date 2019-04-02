@@ -7,16 +7,8 @@ const USER_DELETED = 'USER_DELETED';
 const pubsub = new PubSub();
 
 export default {
-  newUser: {
-    subscribe: () =>  pubsub.asyncIterator([USER_ADDED]),
-    resolve: ({ user }) =>  user
-  },
-  updatedUser: {
-    subscribe: () => pubsub.asyncIterator([USER_UPDATED]),
-    resolve: ({ user }) =>  user
-  },
-  deletedUser: {
-    subscribe: () => pubsub.asyncIterator([USER_DELETED]),
-    resolve: ({ user }) =>  user
-  }
+  // newUser: {
+  //   subscribe: () =>  pubsub.asyncIterator([USER_ADDED]),
+  //   resolve: ({ user }) =>  user
+  // }
 }
