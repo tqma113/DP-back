@@ -14,7 +14,11 @@ const set = (key, oValue) => {
 }
 
 const get = (key) => {
-  return client.get(key)
+  let arr = client.get(key).split('|')
+  return {
+    code: arr[0],
+    expira: parseInt(arr[1])
+  }
 }
 
 const exists = (key) => {

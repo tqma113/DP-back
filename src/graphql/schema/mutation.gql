@@ -1,11 +1,22 @@
 type Mutation {
   register(username: String!, 
-            nickname: String!, 
-            password: String!, 
-            hd_portrial: String!, 
-            gender: Int!, 
-            address: String!, 
-            birthday: Date!,
-            industry: [Industry]!,
-            mailbox: String!): AuthResponse!
+    nickname: String!, 
+    hd_portrial: String!, 
+    gender: String!, 
+    address: String!, 
+    birthday: Date!,
+    email: String!,
+    statement: String!,
+    u_key: String!,
+    e_key: String!): AuthResponse!
+  
+  checkUsername(username: String!): KeyResponse!
+  
+  setPassword(username: String!, password: String!, code: String!): Response!
+
+  sendEmailCode(email: String!): KeyResponse!
+
+  ackEemail(email: String!, code: String!): KeyResponse!
+
+  uploadSingleFile(file: Upload!): Response!
 }

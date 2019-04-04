@@ -1,15 +1,15 @@
 type User {
   id: ID!
   name: String!
-  address: String!
-  gender: Boolean!
+  location: String!
+  gender: String!
   birthday: Date!
   industry: [Industry]!
   register_at: Date!
   last_login_at: Date!
-  hd_protrait: String!
+  head_portrait: String!
   statement: String!
-  mailbox: String!
+  email: String!
   eduBC: [EduBC]!
   articles: [Article]!
   categorys: [Category]!
@@ -126,7 +126,19 @@ type AuthResponse implements Response {
   sessionInfo: SessionInfo!
   user: User!
   success: Boolean!
-  extensions: Extension!
+  extension: Extension!
+}
+
+type CodeResponse implements Response {
+  code: String!
+  success: Boolean!
+  extension: Extension!
+}
+
+type KeyResponse implements Response {
+  key: String!
+  success: Boolean!
+  extension: Extension!
 }
 
 enum Degree {
@@ -146,6 +158,12 @@ enum DynamcisType {
   COMMENT_LIKE
 
   USER_CONCERN
+}
+
+type File {
+  filename: String!
+  mimetype: String!
+  encoding: String!
 }
 
 scalar Date

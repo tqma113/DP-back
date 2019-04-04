@@ -1,14 +1,14 @@
 import redis from '../redis'
 
 const REFRESH_CODE_TIME = 3*60*1000;
-const PREFIX = 'CODE_'
+const PREFIX = 'CUKEY_'
 
 const createNewCode = () => {
-  const all = 'QWERTYUIOPASDFGHJKLZXCVBNM1234567890'
+  const all = 'qwertyuiopasdfghjklzxcvbnm_1234567890'
   let code = ''
 
-  for(let i = 0;i < 6;i++) {
-    code += all[Math.random() * (all.length - 1)]
+  for(let i = 0;i < 16;i++) {
+    code += all[parseInt(Math.random() * (all.length - 1))]
   }
 
   return code
@@ -37,10 +37,10 @@ const code = {
   delete: (username) => {
     redis.delete(PREFIX + username)
   },
-  check: (username, code) => {
+  check: (username, key) => {
     if (redis.exists(PREFIX + username)) {
       const varifyInfo = redis.get(PREFIX + username)
-      return isAvailable(varifyInfo) && varifyInfo.code === code
+      return isAvailable(varifyInfo) && varifyInfo.code === key
     } else {
       return false
     }
@@ -60,7 +60,15 @@ const code = {
     if (count > num/4) {
       clear(num)
     }
+  },
+  exists : (username) => {
+    if (redis.exists(PREFIX + username)) {
+      const varifyInfo = redis.get(PREFIX + username)
+      return !!varifyInfo && varifyInfo.expira > (new Date().getTime())
+    } else {
+      return false
+    }
   }
 }
 
-export default accessToken
+export default code

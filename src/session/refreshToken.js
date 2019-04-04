@@ -8,7 +8,7 @@ const createNewToken = () => {
   let token = 'RT_'
 
   for(let i = 0;i < 16;i++) {
-    token += all[Math.random() * (all.length - 1)]
+    token += all[parseInt(Math.random() * (all.length - 1))]
   }
 
   return token

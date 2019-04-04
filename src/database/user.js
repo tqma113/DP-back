@@ -20,6 +20,32 @@ const selectUserById = (id) => new Promise((resolve, reject) => {
   });
 });
 
+const selectUserByUsername = (username) => new Promise((resolve, reject) => {
+  query({
+    sql: 'SELECT * FROM `user` WHERE `username` = ?',
+    values: [username]
+  })
+  .then((res) => {
+    resolve(res)
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
+const selectUserByEmail = (email) => new Promise((resolve, reject) => {
+  query({
+    sql: 'SELECT * FROM `user` WHERE `email` = ?',
+    values: [email]
+  })
+  .then((res) => {
+    resolve(res)
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
 const selectUsers = () => new Promise((resolve, reject) => {
   query({
     sql: 'SELECT * FROM `user`',
@@ -39,12 +65,18 @@ const selectUsers = () => new Promise((resolve, reject) => {
   });
 });
 
-const insertUser = (user) => new Promise((resolve, reject) => {
+const createUser = (user) => new Promise((resolve, reject) => {
   query({
-    sql: 'INSERT INTO `user` (`name`, `address`) VALUES (?, ?)',
+    sql: 'INSERT INTO `user` (`username`, `nickname`, `head_portrait`, `gender`, `location`, `birthday`,  `email`, `statement`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
     values: [
-        user.name,
-        user.address
+      user.username,
+      user.nickname,
+      user.head_portrait,
+      user.gender,
+      user.location,
+      user.birthday,
+      user.email,
+      user.statement
     ]
   })
   .then((res) => {
@@ -93,7 +125,9 @@ const updateUserById = (id, key, value) => new Promise((resolve, reject) => {
 
 export default {
   selectUserById,
-  insertUser,
+  selectUserByUsername,
+  selectUserByEmail,
+  createUser,
   selectUsers,
   deleteUserById,
   updateUserById
