@@ -6,6 +6,7 @@ import fs from 'fs'
 import https from 'https'
 import http from 'http'
 import path from 'path'
+import jwt from 'express-jwt'
 // import cors from'cors'
 import multer from 'multer'
 
@@ -132,6 +133,19 @@ const app = express()
 //   var file = req.file;
 //   res.send({ret_code: '0'});
 // });
+
+app.use(jwt({
+  secret: 'hello world !',
+  credentialsRequired: false,
+  getToken: function fromHeaderOrQuerystring (req) {
+    if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+        return req.headers.authorization.split(' ')[1];
+    } else if (req.query && req.query.token) {
+      return req.query.token;
+    }
+    return null;
+  }
+}))
 
 app.use('/static', express.static(path.join(__dirname, 'public')))
 

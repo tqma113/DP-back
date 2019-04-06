@@ -16,7 +16,6 @@ const sendCode = async (accepter) => {
     }
 
     console.log('Message sent successfully!');
-    console.log(nodemailer.getTestMessageUrl(info));
   });
 
   return info
