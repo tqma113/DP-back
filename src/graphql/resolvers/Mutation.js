@@ -24,18 +24,19 @@ export default {
     }
 
     let errors = []
+    let response = {}
 
     let isValidUKey = CheckUsernameKey.check(username, u_key);
     let isValidEKey = Email.AckKey.check(email, e_key);
 
-    if (isValidUKey) {
+    if (!isValidUKey) {
       errors.push({
         path: 'register. username ack',
         message: 'username has not been ack'
       })
     }
 
-    if (isValidEKey) {
+    if (!isValidEKey) {
       errors.push({
         path: 'register. email ack',
         message: 'email has not been ack'
@@ -43,7 +44,10 @@ export default {
     }
 
     if (isValidEKey && isValidUKey) {
-      let response = await dataSources.user.createUser(newUser)
+      CheckUsernameKey.delete(username)
+      Email.AckKey.delete(email)
+
+      response = await dataSources.user.createUser(newUser)
       .then((user) => {
         user.industry = []
         user.eduBC = []
@@ -190,6 +194,7 @@ export default {
     let isValid = Email.checkCode(email, code)
 
     if (isValid) {
+      Email.deleteCode(email)
       let key = Email.AckKey.create(email)
       return {
         key: key,

@@ -26,9 +26,14 @@ const checkCode = (email, code) => {
   return Code.check(email)
 }
 
+const deleteCode = (email) => {
+  Code.delete(email)
+}
+
 
 export default {
   sendCode,
   checkCode,
+  deleteCode,
   AckKey
 }
