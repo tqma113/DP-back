@@ -6,12 +6,14 @@ export default (code, accepter) => ({
   subject: 'Now Blog Code ✔',
 
   // plaintext body
-  text: `Hello! Welcome This is your code.${code}`,
+  text: `Hello! Welcome to use Now Blog. Here is your verify code.${code}`,
 
   // HTML body
-  // html:
-  //   '<p><b>Hello</b> to myself <img src="cid:note@example.com"/></p>' +
-  //   '<p>Here\'s a nyan cat for you as an embedded attachment:<br/><img src="cid:nyan@example.com"/></p>',
+  html:
+    '<p><b>Hello!</b> Welcome to use Now Blog.></p>' +
+    '<p>Here\'s  your verify code.</p>' +
+    '<h1>'+ code + '</h1>',
+    
 
   // // An array of attachments
   // attachments: [

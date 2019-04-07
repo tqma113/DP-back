@@ -1,14 +1,27 @@
 import client from './connect';
 
-const getAsync = (key) => new Promise((resolve, reject) => {
-  client.get(key, resolve)
-})
+const getAsync = (key) => {
+  return ((new Promise((resolve, reject) => {
+    console.log(key)
+    client.get(key, (err, reply) => {
+      if (err) {
+        console.log(err)
+      }
+      console.log(reply)
+      resolve(reply)
+    })
+  })).then(reply => reply))
+}
 
 const set = (key, oValue) => {
-  if ((!client.exists(key)) && 
-        typeof oValue == 'object' && 
-        oValue.token && 
-        oValue.expira) {
+  let isValid = typeof oValue == 'object' && 
+              oValue.code && 
+              oValue.expira
+  if (isValid) {
+    if (client.exists(key)) {
+      client.delete(key)
+    }
+
     let value = `${oValue.token}|${oValue.expira}`
     client.set(key, value)
     return true
@@ -17,8 +30,8 @@ const set = (key, oValue) => {
   }
 }
 
-const get = async (key) => {
-  let value = await getAsync(key)
+const get = (key) => {
+  let value = getAsync(key)
   if (!value) return value
 
   let arr = value.split('|')
@@ -36,7 +49,7 @@ const deleteKey = (key) => {
   client.del(key)
 }
 
-const clear = async (num, check) => {
+const clear = (num, check) => {
   let count = 0
 
   for (let i = 0;i < num; i++) {

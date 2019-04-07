@@ -26,9 +26,9 @@ const code = {
       expira: (new Date()).getTime() + REFRESH_CODE_TIME
     }
 
-    redis.set(PREFIX + username, varifyInfo)
+    let isSuccess = redis.set(PREFIX + username, varifyInfo)
 
-    return code
+    return isSuccess ? code : false
   },
   refresh: (username) => {
     this.delete(username)
