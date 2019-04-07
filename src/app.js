@@ -7,6 +7,8 @@ import https from 'https'
 import http from 'http'
 import path from 'path'
 import jwt from 'express-jwt'
+import morgan from 'morgan'
+import rfs from 'rotating-file-stream'
 // import cors from'cors'
 import multer from 'multer'
 
@@ -148,6 +150,15 @@ app.use(jwt({
 }))
 
 app.use('/static', express.static(path.join(__dirname, 'public')))
+
+// create a rotating write stream
+var accessLogStream = rfs('access.log', {
+  interval: '1d', // rotate daily
+  path: path.join(__dirname, 'log')
+})
+
+// setup the logger
+app.use(morgan('combined', { stream: accessLogStream }))
 
 apollo.applyMiddleware({ app })
 
