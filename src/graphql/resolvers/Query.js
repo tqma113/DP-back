@@ -72,5 +72,11 @@ export default {
     return {
       
     }
-  }
+  },
+  logout: async (root, { username, token }, { dataSources }, info) => {
+    
+    return {
+      
+    }
+  },
 }
