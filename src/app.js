@@ -9,6 +9,7 @@ import path from 'path'
 import jwt from 'express-jwt'
 import morgan from 'morgan'
 import rfs from 'rotating-file-stream'
+import child_process from 'child_process'
 // import cors from'cors'
 import multer from 'multer'
 
@@ -17,6 +18,7 @@ import session from './session'
 import {
   user
 } from './database';
+import { listenerCount } from 'cluster';
 
 const configurations = {
   // Note: You may need sudo to run on port 443
@@ -33,6 +35,8 @@ const corsOptions = {
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true
 }
+
+const redisClear = './src/redis/clear.js'
 
 const apollo = new ApolloServer({ 
   typeDefs, 
@@ -180,6 +184,12 @@ if (config.ssl) {
 
 // Add subscription support
 apollo.installSubscriptionHandlers(server)
+
+// Start redis clear
+const redisClearProcess = child_process.fork(redisClear)
+redisClearProcess.on('message', (message) => {
+  console.log('[Redis]', message)
+})
 
 server.listen({ port: config.port }, () => {
   console.log(
