@@ -1,5 +1,38 @@
 import query from './mysql/index';
 
+const selectUser = (conditions, results) => new Promise((resolve, reject) => {
+  let sql = ''
+
+  let isResultsValid = typeof results == "object" && 
+                        Array.isArray(results) && 
+                        results.length > 0
+  if (isResultsValid) {
+    sql = 'SELECT ' + results.join(',') +' FROM `user`'
+  } else {
+    sql = 'SELECT * FROM `user`'
+  }
+
+  let isConditionsValid = typeof conditions == 'object' && 
+                            Object.keys(conditions).length > 0
+  if (isConditionsValid) {
+    sql += ' WHERE ' + 
+            Object.keys(conditions)
+            .map((value => '`' + value +'` = ?'))
+            .join(' AND ')
+  }
+
+  query({
+    sql,
+    values: isConditionsValid ? Object.values(conditions) : []
+  })
+  .then((res) => {
+    resolve(res)
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
 const selectUserById = (id) => new Promise((resolve, reject) => {
   query({
     sql: 'SELECT * FROM `user` WHERE `id` = ?',
@@ -85,7 +118,6 @@ const createUser = (user) => new Promise((resolve, reject) => {
     })
   })
   .catch((err) => {
-    console.log(err)
     reject(err)
   });
 });
@@ -124,6 +156,7 @@ const updateUserById = (id, key, value) => new Promise((resolve, reject) => {
 });
 
 export default {
+  selectUser,
   selectUserById,
   selectUserByUsername,
   selectUserByEmail,

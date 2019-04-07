@@ -6,19 +6,23 @@ import fs from 'fs'
 import https from 'https'
 import http from 'http'
 import path from 'path'
-import jwt from 'express-jwt'
 import morgan from 'morgan'
 import rfs from 'rotating-file-stream'
 import child_process from 'child_process'
 // import cors from'cors'
 import multer from 'multer'
-
-import session from './session'
+import { listenerCount } from 'cluster';
 
 import {
   user
 } from './database';
-import { listenerCount } from 'cluster';
+
+import CheckUsernameKey from './key/check_username';
+import CheckEmailKey from './key/check_email'
+
+import Email from './email/index'
+import jwt from './jwt/index'
+
 
 const configurations = {
   // Note: You may need sudo to run on port 443
@@ -86,14 +90,20 @@ const apollo = new ApolloServer({
     // console.log(response);
     return response;
   },
-  context: ({ req }) => {
-    // TODO 
-    // console.log(Object.keys(req))
-    // console.log(req.body)
+  context: async ({ req, res }) => {
+    let token = req.headers.authorization
+    let info = jwt.verify(token)
+    let username = info.username
+    let currentUser = await user.selectUser({username}, ['id', 'username', 'email'])
+    return { req, user: currentUser }
   },
   dataSources: () => {
     return {
-      user
+      user,
+      jwt,
+      Email,
+      CheckEmailKey,
+      CheckUsernameKey
     }
   },
   rootValue: (documentAST) => {
@@ -140,18 +150,18 @@ const app = express()
 //   res.send({ret_code: '0'});
 // });
 
-app.use(jwt({
-  secret: 'hello world !',
-  credentialsRequired: false,
-  getToken: function fromHeaderOrQuerystring (req) {
-    if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
-        return req.headers.authorization.split(' ')[1];
-    } else if (req.query && req.query.token) {
-      return req.query.token;
-    }
-    return null;
-  }
-}))
+// app.use(jwt({
+//   secret: 'hello world !',
+//   credentialsRequired: false,
+//   getToken: function fromHeaderOrQuerystring (req) {
+//     if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+//         return req.headers.authorization.split(' ')[1];
+//     } else if (req.query && req.query.token) {
+//       return req.query.token;
+//     }
+//     return null;
+//   }
+// }))
 
 app.use('/static', express.static(path.join(__dirname, 'public')))
 

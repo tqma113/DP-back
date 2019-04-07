@@ -16,10 +16,6 @@ const clearRedis = (num) => {
     return isAvailable(varifyInfo)
   }
 
-  redis.get('CEKEY_mtq1997@126.com').then((value) => {
-    console.log(value)
-  })
-
   redis.clear(num, check).then((count) => {
     if (count > num/4) {
       clear(num)

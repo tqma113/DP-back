@@ -1,8 +1,10 @@
-const { PubSub, withFilter } = require('apollo-server');
+import { PubSub, withFilter } from 'apollo-server';
+
 import CheckUsernameKey from '../../key/check_username';
 import CheckEmailKey from '../../key/check_email'
 
 import Email from '../../email/index'
+import jwt from '../../jwt/index'
 
 const USER_ADDED = 'USER_ADDED';
 const USER_UPDATED = 'USER_UPDATED';
@@ -26,8 +28,8 @@ export default {
     let errors = []
     let response = {}
 
-    let isValidUKey = CheckUsernameKey.check(username, u_key);
-    let isValidEKey = Email.AckKey.check(email, e_key);
+    let isValidUKey = dataSources.CheckUsernameKey.check(username, u_key);
+    let isValidEKey = dataSources.Email.AckKey.check(email, e_key);
 
     if (!isValidUKey) {
       errors.push({
@@ -44,8 +46,8 @@ export default {
     }
 
     if (isValidEKey && isValidUKey) {
-      CheckUsernameKey.delete(username)
-      Email.AckKey.delete(email)
+      dataSources.CheckUsernameKey.delete(username)
+      dataSources.Email.AckKey.delete(email)
 
       response = await dataSources.user.createUser(newUser)
       .then((user) => {
@@ -58,11 +60,13 @@ export default {
         user.likes = []
         user.collections = []
         user.dynamics = []
+
+        let token = dataSources.jwt.sign({ username })
   
         return {
           sessionInfo: {
             username,
-            tiken: 'adfadf.adfdfsadsf',
+            token,
             isRefresh: false
           },
           user,
@@ -114,7 +118,7 @@ export default {
   checkUsername: async (root, { username }, { dataSources }, info) => {
     let response = dataSources.user.selectUserByUsername(username)
       .then((users) => {
-        if (users.length > 0 && !CheckUsernameKey.exists(username)) {
+        if (users.length > 0 && !dataSources.CheckUsernameKey.exists(username)) {
           return {
             key: '',
             success: false,
@@ -127,7 +131,7 @@ export default {
             }
           }
         } else {
-          let key = CheckUsernameKey.create(username)
+          let key = dataSources.CheckUsernameKey.create(username)
 
           return {
             key,
@@ -153,7 +157,7 @@ export default {
   sendEmailCode: async (root, { email }, { dataSources }, info) => {
     let response = dataSources.user.selectUserByEmail(email)
       .then((users) => {
-        if (users.length > 0 && !CheckEmailKey.exists(email)) {
+        if (users.length > 0 && !dataSources.CheckEmailKey.exists(email)) {
           return {
             key: '',
             success: false,
@@ -166,8 +170,8 @@ export default {
             }
           }
         } else {
-          let key = CheckEmailKey.create(email)
-          let info = Email.sendCode(email)
+          let key = dataSources.CheckEmailKey.create(email)
+          let info = dataSources.Email.sendCode(email)
 
           return {
             key,
@@ -191,11 +195,11 @@ export default {
     return response
   },
   ackEemail: async (root, { email, code }, { dataSources }, info) => {
-    let isValid = Email.checkCode(email, code)
+    let isValid = dataSources.Email.checkCode(email, code)
 
     if (isValid) {
-      Email.deleteCode(email)
-      let key = Email.AckKey.create(email)
+      dataSources.Email.deleteCode(email)
+      let key = dataSources.Email.AckKey.create(email)
       return {
         key: key,
         success: true,
