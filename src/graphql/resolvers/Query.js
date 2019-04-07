@@ -1,6 +1,5 @@
 export default {
   login: async (root, { username, password }, { dataSources }, info) => {
-    console.log(info)
     let response = {}
     let errors = []
 
