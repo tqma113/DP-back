@@ -16,11 +16,10 @@ const clearRedis = (num) => {
     return isAvailable(varifyInfo)
   }
 
-  redis.clear(num, check).then((count) => {
-    if (count > num/4) {
-      clear(num)
-    }
-  })
+  let count = redis.clear(num, check)
+  if (count > num/4) {
+    clear(num)
+  }
 }
 
 setInterval(clearRedis, 1000*60*30, 50)
