@@ -1,11 +1,5 @@
 import { PubSub, withFilter } from 'apollo-server';
 
-import CheckUsernameKey from '../../key/check_username';
-import CheckEmailKey from '../../key/check_email'
-
-import Email from '../../email/index'
-import jwt from '../../jwt/index'
-
 const USER_ADDED = 'USER_ADDED';
 const USER_UPDATED = 'USER_UPDATED';
 const USER_DELETED = 'USER_DELETED';
