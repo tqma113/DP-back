@@ -17,7 +17,7 @@ const set = (key, oValue) => {
               oValue.expira
   if (isValid) {
     if (client.exists(key)) {
-      client.delete(key)
+      client.del(key)
     }
 
     let value = `${oValue.token}|${oValue.expira}`
