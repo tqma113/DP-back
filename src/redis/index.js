@@ -2,12 +2,10 @@ import client from './connect';
 
 const getAsync = (key) => {
   return ((new Promise((resolve, reject) => {
-    console.log(key)
     client.get(key, (err, reply) => {
       if (err) {
         console.log(err)
       }
-      console.log(reply)
       resolve(reply)
     })
   })).then(reply => reply))
