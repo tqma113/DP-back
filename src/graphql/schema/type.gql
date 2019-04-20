@@ -1,14 +1,15 @@
 type User {
   id: ID!
-  name: String!
-  location: String!
+  username: String!
+  nickname: String!
+  location: String
   gender: String!
-  birthday: Date!
+  birthday: Date
   industry: [Industry]!
   register_at: Date!
   last_login_at: Date!
-  head_portrait: String!
-  statement: String!
+  head_portrait: String
+  statement: String
   email: String!
   eduBC: [EduBC]!
   articles: [Article]!
@@ -88,13 +89,13 @@ type Message {
 
 type SessionInfo {
   username: String!
-  token: String!
+  token: String
   isRefresh: Boolean!
 }
 
 type UploadInfo {
   filename: String!
-  success: Boolean!
+  isSuccess: Boolean!
   size: Int!
   uri: String!
 }
@@ -110,7 +111,7 @@ type Extension {
 }
 
 interface Response {
-  success: Boolean!
+  isSuccess: Boolean!
   extension: Extension!
 }
 
@@ -124,20 +125,20 @@ type Dynamics {
 
 type AuthResponse implements Response {
   sessionInfo: SessionInfo!
-  user: User!
-  success: Boolean!
+  user: User
+  isSuccess: Boolean!
   extension: Extension!
 }
 
 type CodeResponse implements Response {
   code: String!
-  success: Boolean!
+  isSuccess: Boolean!
   extension: Extension!
 }
 
 type KeyResponse implements Response {
   key: String!
-  success: Boolean!
+  isSuccess: Boolean!
   extension: Extension!
 }
 

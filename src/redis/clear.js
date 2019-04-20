@@ -4,7 +4,7 @@ const isAvailable = (varifyInfo) => varifyInfo.code &&
                         varifyInfo.expira &&
                         +varifyInfo.expira > (new Date().getTime())
 
-const clearRedis = (num) => {
+const clearRedis = async (num) => {
   const check = (value) => {
     if (!value) return false
     
@@ -16,7 +16,7 @@ const clearRedis = (num) => {
     return isAvailable(varifyInfo)
   }
 
-  let count = redis.clear(num, check)
+  let count = await redis.clear(num, check)
   if (count > num/4) {
     clear(num)
   }

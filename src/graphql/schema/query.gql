@@ -1,7 +1,3 @@
 type Query {
-  login(username: String!, password: String!): AuthResponse!
-
   checkLoginState(username: ID!, token: String!): AuthResponse!
-
-  logout(username: String!): Response!
 }

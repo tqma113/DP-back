@@ -1,82 +1,76 @@
 export default {
-  login: async (root, { username, password }, { dataSources }, info) => {
+  checkLoginState: async (root, { username, token }, { dataSources }, info) => {
     let response = {}
     let errors = []
+    try {
+      let user = {}
 
-    let user = (await dataSources.user.selectUser({ username }, ['password']))[0]
-
-    let isValid = user && user.password && user.password === password
-    if (!isValid) {
-      if (!user) {
-        errors.push({
-          path: 'login. username',
-          message: 'username is not exist'
-        })
+      if (username.indexOf('@') !== -1) {
+        user = (await dataSources.user.selectUser({ email: username }, ['password']))[0]
+      } else {
+        user = (await dataSources.user.selectUser({ username }, ['password']))[0]
       }
-      
-      if (user && user.password && user.password !== password) {
-        errors.push({
-          path: 'login. password',
-          message: 'password is not right'
-        })
-      }
-    }
+  
+      let sessionInfo = await dataSources.jwt.verify(username, token)
+      let isValid = !!sessionInfo && user
 
-    if (isValid) {
-      user = (await dataSources.user.selectUser({ username }, []))[0]
-      user.industry = []
-      user.eduBC = []
-      user.articles = []
-      user.categorys = []
-      user.concerned_categorys = []
-      user.concerned = []
-      user.likes = []
-      user.collections = []
-      user.dynamics = []
+      if (isValid) {
+        user = (await dataSources.user.selectUser({ username }, []))[0]
+        user.industry = []
+        user.eduBC = []
+        user.articles = []
+        user.categorys = []
+        user.concerned_categorys = []
+        user.concerned = []
+        user.likes = []
+        user.collections = []
+        user.dynamics = []
+  
+        response = {
+          sessionInfo: {
+            username,
+            token,
+            isRefresh: false
+          },
+          user,
+          isSuccess: true,
+          extension: {
+            operator: 'checkLoginState',
+            errors
+          }
+        }
+      } else {
+        if (!user) {
+          errors.push({
+            path: 'checkLoginState.username',
+            message: 'username is not exist'
+          })
+        }
+        
+        if (!sessionInfo) {
+          errors.push({
+            path: 'checkLoginState.password',
+            message: 'token is invalid'
+          })
+        }
 
-      let token = dataSources.jwt.sign({ username })
-
-      response = {
-        sessionInfo: {
-          username,
-          token,
-          isRefresh: false
-        },
-        user,
-        success: true,
-        extension: {
-          operator: 'login',
-          errors
+        response = {
+          sessionInfo: {
+            username,
+            tiken: '',
+            isRefresh: false
+          },
+          isSuccess: false,
+          extension: {
+            operator: 'checkLoginState',
+            errors
+          }
         }
       }
-    } else {
-      response = {
-        sessionInfo: {
-          username,
-          tiken: '',
-          isRefresh: false
-        },
-        user: {},
-        success: false,
-        extension: {
-          operator: 'login',
-          errors
-        }
-      }
-    }
+    } catch (err) {
 
+    }
+    
     return response
-  },
-  checkLoginState: async (root, { username, token }, { dataSources }, info) => {
-    
-    return {
-      
-    }
-  },
-  logout: async (root, { username, token }, { dataSources }, info) => {
-    
-    return {
-      
-    }
   },
 }

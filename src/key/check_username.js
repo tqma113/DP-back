@@ -14,38 +14,39 @@ const createNewCode = () => {
   return code
 }
 
-const isAvailable = (varifyInfo) => varifyInfo.code &&
+const isAvailable = (varifyInfo) => varifyInfo && varifyInfo.code &&
                           varifyInfo.expira &&
                           +varifyInfo.expira > (new Date().getTime())
 
 const code = {
-  create: (username) => {
+  create: async (username) => {
     const code = createNewCode();
     const varifyInfo = {
       code,
       expira: (new Date()).getTime() + REFRESH_CODE_TIME
     }
 
-    let isSuccess = redis.set(PREFIX + username, varifyInfo)
+    let isSuccess = await redis.set(PREFIX + username, varifyInfo)
 
     return isSuccess ? code : false
   },
-  refresh: (username) => {
-    this.delete(username)
-    return this.create(username)
+  refresh: async (username) => {
+    await this.delete(username)
+    return await this.create(username)
   },
-  delete: (username) => {
-    redis.delete(PREFIX + username)
+  delete: async (username) => {
+    return await redis.delete(PREFIX + username)
   },
-  check: (username, key) => {
-    if (redis.exists(PREFIX + username)) {
-      const varifyInfo = redis.get(PREFIX + username)
+  check: async (username, key) => {
+    if (await redis.exists(PREFIX + username)) {
+      const varifyInfo = await redis.get(PREFIX + username)
+      await redis.delete(PREFIX + username)
       return isAvailable(varifyInfo) && varifyInfo.code === key
     } else {
       return false
     }
   },
-  clear: (num) => {
+  clear: async (num) => {
     const check = (value) => {
       let arr = value.split('|')
       const varifyInfo = {
@@ -55,15 +56,15 @@ const code = {
       return isAvailable(varifyInfo)
     }
 
-    const count = redis.clear(num, check)
+    const count = await redis.clear(num, check)
 
     if (count > num/4) {
       clear(num)
     }
   },
-  exists : (username) => {
-    if (redis.exists(PREFIX + username)) {
-      const varifyInfo = redis.get(PREFIX + username)
+  exists: async (username) => {
+    if (await redis.exists(PREFIX + username)) {
+      const varifyInfo = await redis.get(PREFIX + username)
       return !!varifyInfo && varifyInfo.expira > (new Date().getTime())
     } else {
       return false

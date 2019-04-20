@@ -4,34 +4,65 @@ const getAsync = (key) => {
   return ((new Promise((resolve, reject) => {
     client.get(key, (err, reply) => {
       if (err) {
-        console.log(err)
+        reject(false)
       }
       resolve(reply)
     })
-  })).then(reply => reply))
+  })).then(reply => reply).catch(err => false))
 }
 
-const set = (key, oValue) => {
+const setAsync = (key, value) => {
+  return ((new Promise((resolve, reject) => {
+    client.set(key, value, (err, reply) => {
+      if (err) {
+        reject(false)
+      }
+      resolve(true)
+    })
+  })).then(reply => reply).catch(err => false))
+}
+
+const delAsync = (key) => {
+  return ((new Promise((resolve, reject) => {
+    client.del(key, (err, reply) => {
+      if (err) {
+        reject(false)
+      }
+      resolve(true)
+    })
+  })).then(reply => reply).catch(err => false))
+}
+
+const existAsync = (key) => {
+  return ((new Promise((resolve, reject) => {
+    client.exists(key, (err, reply) => {
+      if (err) {
+        reject(false)
+      }
+      resolve(true)
+    })
+  })).then(reply => reply).catch(err => false))
+}
+
+const set = async (key, oValue) => {
   let isValid = typeof oValue == 'object' && 
               oValue.code && 
               oValue.expira
   if (isValid) {
-    if (client.exists(key)) {
-      client.del(key)
+    if (await client.exists(key)) {
+      await client.del(key)
     }
 
-    let value = `${oValue.token}|${oValue.expira}`
-    client.set(key, value)
-    return true
+    let value = `${oValue.code}|${oValue.expira}`
+    return await setAsync(key, value)
   } else {
     return false
   }
 }
 
-const get = (key) => {
-  let value = getAsync(key)
+const get = async (key) => {
+  let value = await getAsync(key)
   if (!value) return value
-
   let arr = value.split('|')
   return {
     code: arr[0],
@@ -39,24 +70,24 @@ const get = (key) => {
   }
 }
 
-const exists = (key) => {
-  return client.exists(key)
+const exists = async (key) => {
+  return await existAsync(key)
 }
 
-const deleteKey = (key) => {
-  client.del(key)
+const deleteKey = async (key) => {
+  return await delAsync(key)
 }
 
-const clear = (num, check) => {
+const clear = async (num, check) => {
   let count = 0
 
   for (let i = 0;i < num; i++) {
-    let key = client.RANDOMKEY((key) => {
+    let key = client.RANDOMKEY(async (key) => {
       if (!key) return;
 
       let value = get(key)
       if (!check(value)) {
-        deleteKey(key)
+        await deleteKey(key)
         count++
       }
     })

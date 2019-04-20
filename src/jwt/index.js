@@ -8,7 +8,7 @@ import redis from '../redis'
 const privateKey = fs.readFileSync(path.resolve(__dirname, './key/rsa_private_key.pem'));
 const publicKey = fs.readFileSync(path.resolve(__dirname, './key/rsa_public.key'));
 
-const REFRESH_CODE_TIME = 3*60*1000;
+const JWT_CODE_TIME = 7*24*60*60*1000;
 const PREFIX = 'JWTID_'
 
 const createNewId = () => {
@@ -22,25 +22,31 @@ const createNewId = () => {
   return code
 }
 
-const sign = (username) => {
+const sign = async (username) => {
   let jwtId = createNewId()
-  redis.set(PREFIX + username, jwtId)
-  return jwt.sign({ username, jwtId }, privateKey, { algorithm: 'RS256', expiresIn: '7d' })
+  const varifyInfo = {
+    code: jwtId,
+    expira: (new Date()).getTime() + JWT_CODE_TIME
+  }
+  let isSuccess = await redis.set(PREFIX + username, varifyInfo)
+  return isSuccess && jwt.sign({ username, jwtId }, privateKey, { algorithm: 'RS256', expiresIn: '7d' })
 }
 
-const verify = (token) => {
+const verify = async (username, token) => {
   let info = jwt.verify(token, publicKey, { algorithms: ['RS256'] })
-  let jwtId = redis.get(info.username)
+  let varifyInfo = await redis.get(PREFIX + info.username)
 
-  if (info.jwtId !== jwtId) {
+  if (info.jwtId !== varifyInfo.code || info.username !== username) {
     return false
   }
+  
+  await redis.delete(PREFIX + username)
 
   return info
 }
 
-const stale = (username) => {
-  redis.delete(PREFIX + username)
+const stale = async (username) => {
+  return await redis.delete(PREFIX + username)
 }
 
 export default {

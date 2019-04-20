@@ -14,38 +14,39 @@ const createNewCode = () => {
   return code
 }
 
-const isAvailable = (varifyInfo) => varifyInfo.code &&
+const isAvailable = (varifyInfo) => varifyInfo && varifyInfo.code &&
                           varifyInfo.expira &&
                           +varifyInfo.expira > (new Date().getTime())
 
 const code = {
-  create: (email) => {
+  create: async (email) => {
     const code = createNewCode();
     const varifyInfo = {
       code,
       expira: (new Date()).getTime() + REFRESH_CODE_TIME
     }
 
-    let isSuccess = redis.set(PREFIX + email, varifyInfo)
+    let isSuccess = await redis.set(PREFIX + email, varifyInfo)
 
     return isSuccess ? code : false
   },
-  refresh: (email) => {
-    this.delete(email)
-    return this.create(email)
+  refresh: async (email) => {
+    await this.delete(email)
+    return await this.create(email)
   },
-  delete: (email) => {
-    redis.delete(PREFIX + email)
+  delete: async (email) => {
+    return await redis.delete(PREFIX + email)
   },
-  check: (email, code) => {
-    if (redis.exists(PREFIX + email)) {
-      const varifyInfo = redis.get(PREFIX + email)
+  check: async (email, code) => {
+    if (await redis.exists(PREFIX + email)) {
+      const varifyInfo = await redis.get(PREFIX + email)
+      await redis.delete(PREFIX + email)
       return isAvailable(varifyInfo) && varifyInfo.code === code
     } else {
       return false
     }
   },
-  clear: (num) => {
+  clear: async (num) => {
     const check = (value) => {
       let arr = value.split('|')
       const varifyInfo = {
@@ -55,15 +56,15 @@ const code = {
       return isAvailable(varifyInfo)
     }
 
-    const count = redis.clear(num, check)
+    const count = await redis.clear(num, check)
 
     if (count > num/4) {
       clear(num)
     }
   },
-  exists : (email) => {
-    if (redis.exists(PREFIX + email)) {
-      const varifyInfo = redis.get(PREFIX + email)
+  exists: async (email) => {
+    if (await redis.exists(PREFIX + email)) {
+      const varifyInfo = await redis.get(PREFIX + email)
       return !!varifyInfo && varifyInfo.expira > (new Date().getTime())
     } else {
       return false

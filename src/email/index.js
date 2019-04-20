@@ -5,7 +5,7 @@ import AckKey from './ackKey'
 
 
 const sendCode = async (accepter) => {
-  let code = Code.create(accepter)
+  let code = await Code.create(accepter)
   let message = createMessage(code, accepter)
 
   let info = await Transporter.sendMail(message, (error, info) => {
@@ -21,12 +21,12 @@ const sendCode = async (accepter) => {
   return info
 }
 
-const checkCode = (email, code) => {
-  return Code.check(email)
+const checkCode = async (email, code) => {
+  return await Code.check(email, code)
 }
 
-const deleteCode = (email) => {
-  Code.delete(email)
+const deleteCode = async (email) => {
+  return await Code.delete(email)
 }
 
 
