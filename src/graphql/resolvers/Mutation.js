@@ -1,4 +1,5 @@
 import { PubSub, withFilter } from 'apollo-server';
+import moment from 'moment'
 
 const USER_ADDED = 'USER_ADDED';
 const USER_UPDATED = 'USER_UPDATED';
@@ -7,7 +8,7 @@ const USER_DELETED = 'USER_DELETED';
 const pubsub = new PubSub();
 
 export default {
-  login: async (root, { username, password }, { dataSources }, info) => {
+  login: async (root, { username, password }, { dataSources, res }, info) => {
     let response = {}
     let errors = []
     let user = {}
@@ -22,32 +23,20 @@ export default {
       let isValid = user && user.password && user.password === password
   
       if (isValid) {
-        user = (await dataSources.user.selectUser({ username }, []))[0]
-        user.industry = []
-        user.eduBC = []
-        user.articles = []
-        user.categorys = []
-        user.concerned_categorys = []
-        user.concerned = []
-        user.likes = []
-        user.collections = []
-        user.dynamics = []
-  
         let token = await dataSources.jwt.sign({ username })
   
         response = {
-          sessionInfo: {
-            username,
-            token,
-            isRefresh: false
-          },
-          user,
+          token,
+          username,
           isSuccess: true,
           extension: {
             operator: 'login',
             errors
           }
         }
+        let cookie = `customer=${username};username=${username};path=/;Expires=${moment().add(7, 'd').format('ddd, D MMM YYYY HH:mm:SS')} GMT;Secure;HttpOnly`
+        console.log(cookie)
+        res.setHeader('Set-Cookie', cookie)
       } else {
         if (!user) {
           errors.push({
@@ -64,11 +53,6 @@ export default {
         }
 
         response = {
-          sessionInfo: {
-            username,
-            tiken: '',
-            isRefresh: false
-          },
           isSuccess: false,
           extension: {
             operator: 'login',
@@ -82,11 +66,6 @@ export default {
         message: JSON.stringify(err)
       })
       response = {
-        sessionInfo: {
-          username,
-          tiken: '',
-          isRefresh: false
-        },
         isSuccess: false,
         extension: {
           operator: 'login',
@@ -122,25 +101,11 @@ export default {
         await dataSources.Email.AckKey.delete(email)
   
         let user = await dataSources.user.createUser(newUser)
-        user.industry = []
-        user.eduBC = []
-        user.articles = []
-        user.categorys = []
-        user.concerned_categorys = []
-        user.concerned = []
-        user.likes = []
-        user.collections = []
-        user.dynamics = []
-  
         let token = await dataSources.jwt.sign(username)
         
         response = {
-          sessionInfo: {
-            username,
-            token,
-            isRefresh: false
-          },
-          user,
+          token,
+          username: user.username,
           isSuccess: true,
           extension: {
             operator: 'register',
@@ -162,11 +127,6 @@ export default {
           })
         }
         response = {
-          sessionInfo: {
-            username,
-            tiken: '',
-            isRefresh: false
-          },
           isSuccess: false,
           extension: {
             operator: 'register',
@@ -180,11 +140,6 @@ export default {
         message: JSON.stringify(err)
       })
       response = {
-        sessionInfo: {
-          username,
-          tiken: '',
-          isRefresh: false
-        },
         isSuccess: false,
         extension: {
           operator: 'register',

@@ -124,6 +124,13 @@ type Dynamics {
 }
 
 type AuthResponse implements Response {
+  token: String
+  username: String
+  isSuccess: Boolean!
+  extension: Extension!
+}
+
+type SessionResponse implements Response {
   sessionInfo: SessionInfo!
   user: User
   isSuccess: Boolean!
