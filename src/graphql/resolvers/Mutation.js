@@ -23,7 +23,7 @@ export default {
       let isValid = user && user.password && user.password === password
   
       if (isValid) {
-        let token = await dataSources.jwt.sign({ username })
+        let token = await dataSources.jwt.sign(username)
   
         response = {
           token,
@@ -35,7 +35,6 @@ export default {
           }
         }
         let cookie = `customer=${username};username=${username};path=/;Expires=${moment().add(7, 'd').format('ddd, D MMM YYYY HH:mm:SS')} GMT;Secure;HttpOnly`
-        console.log(cookie)
         res.setHeader('Set-Cookie', cookie)
       } else {
         if (!user) {

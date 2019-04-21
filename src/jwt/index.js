@@ -22,6 +22,28 @@ const createNewId = () => {
   return code
 }
 
+const signAsync = ({ username, jwtId }) => {
+  return ((new Promise((resolve, reject) => {
+    jwt.sign({ username, jwtId }, privateKey, { algorithm: 'RS256', expiresIn: '7d' }, (err, reply) => {
+      if (err) {
+        reject(false)
+      }
+      resolve(reply)
+    })
+  })).then(reply => reply).catch(err => false))
+}
+
+const verifyAsync = (token) => {
+  return ((new Promise((resolve, reject) => {
+    jwt.verify(token, publicKey, { algorithms: ['RS256'] }, (err, reply) => {
+      if (err) {
+        reject(false)
+      }
+      resolve(reply)
+    })
+  })).then(reply => reply).catch(err => false))
+}
+
 const sign = async (username) => {
   let jwtId = createNewId()
   const varifyInfo = {
@@ -29,19 +51,17 @@ const sign = async (username) => {
     expira: (new Date()).getTime() + JWT_CODE_TIME
   }
   let isSuccess = await redis.set(PREFIX + username, varifyInfo)
-  return isSuccess && jwt.sign({ username, jwtId }, privateKey, { algorithm: 'RS256', expiresIn: '7d' })
+  return isSuccess && await signAsync({ username, jwtId })
 }
 
 const verify = async (username, token) => {
-  let info = jwt.verify(token, publicKey, { algorithms: ['RS256'] })
+  let info = await verifyAsync(token)
   let varifyInfo = await redis.get(PREFIX + info.username)
-
-  if (info.jwtId !== varifyInfo.code || info.username !== username) {
+  
+  if (!info || !varifyInfo || info.jwtId !== varifyInfo.code || info.username !== username) {
     return false
   }
   
-  await redis.delete(PREFIX + username)
-
   return info
 }
 

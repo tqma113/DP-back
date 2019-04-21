@@ -49,7 +49,7 @@ export default {
         
         if (!sessionInfo) {
           errors.push({
-            path: 'checkLoginState.password',
+            path: 'checkLoginState.token',
             message: 'token is invalid'
           })
         }
@@ -68,7 +68,23 @@ export default {
         }
       }
     } catch (err) {
-
+      console.log(err)
+      errors.push({
+        path: 'register',
+        message: JSON.stringify(err)
+      })
+      response = {
+        sessionInfo: {
+          username,
+          tiken: '',
+          isRefresh: false
+        },
+        isSuccess: false,
+        extension: {
+          operator: 'checkLoginState',
+          errors
+        }
+      }
     }
     
     return response
