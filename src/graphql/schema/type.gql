@@ -149,6 +149,12 @@ type KeyResponse implements Response {
   extension: Extension!
 }
 
+type UploadResponse implements Response {
+  url: String!
+  isSuccess: Boolean!
+  extension: Extension!
+}
+
 enum Degree {
   BACHELOR
   MASTER

@@ -1,11 +1,36 @@
 import { PubSub, withFilter } from 'apollo-server';
 import moment from 'moment'
+import fs from 'fs'
+import path from 'path'
 
 const USER_ADDED = 'USER_ADDED';
 const USER_UPDATED = 'USER_UPDATED';
 const USER_DELETED = 'USER_DELETED';
 
+const IMAGE_LOAD_PATH = __dirname + '/../../public/image'
+
 const pubsub = new PubSub();
+
+const getRandomFilename = (mimetype) => {
+  const all = 'qwertyuiopasdfghjklzxcvbnm-1234567890'
+  let filename = ''
+  let suffix = '.' + mimetype.split('/')[1]
+
+  for(let i = 0;i < 36;i++) {
+    filename += all[parseInt(Math.random() * (all.length - 1))]
+  }
+
+  return filename + suffix
+}
+
+const writeWithStream = (stream, mimetype) => new Promise((resolve, reject) => {
+  let filename = getRandomFilename(mimetype)
+  let out = fs.createWriteStream(path.resolve(IMAGE_LOAD_PATH, filename))
+
+  stream.on('data', data => out.write(data))
+  stream.on('end', () => resolve('image/' + filename))
+  stream.on('error', reject)
+})
 
 export default {
   login: async (root, { username, password }, { dataSources, res }, info) => {
@@ -319,9 +344,40 @@ export default {
       
     }
   },
-  // uploadSingleFile: async (root, { file }, { dataSources }, info) => {
-  //   file.then((file) => {
+  uploadSingleImage: async (root, { image }, { dataSources }, info) => {
+    let response = {}
+    let errors = []
 
-  //   })
-  // },
+    try {
+      const { createReadStream, filename, mimetype, encoding } = await image
+      const stream = createReadStream()
+      const url = await writeWithStream(stream, mimetype)
+      
+      response = {
+        url,
+        isSuccess: true,
+        extension: {
+          operator: "upload file",
+          errors
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'ackEmail',
+        message: JSON.stringify(err)
+      })
+
+      response = {
+        url: '',
+        isSuccess: false,
+        extension: {
+          operator: "upload file",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
 }

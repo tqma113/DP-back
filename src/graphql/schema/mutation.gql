@@ -22,5 +22,5 @@ type Mutation {
 
   ackEmail(email: String!, code: String!, key: String!): KeyResponse!
 
-  uploadSingleFile(file: Upload!): Response!
+  uploadSingleImage(image: Upload!): UploadResponse!
 }
