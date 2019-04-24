@@ -155,6 +155,21 @@ const updateUserById = (id, key, value) => new Promise((resolve, reject) => {
   });
 });
 
+const updateUserByEmail = (email, key, value) => new Promise((resolve, reject) => {
+  query({
+    sql: 'UPDATE `user` SET `'+ key + '` = ? WHERE (`email` = ?)',
+    values: [value, email]
+  })
+  .then((res) => {
+    selectUserById(email).then((res) => {
+      resolve(res[0])
+    })
+  })
+  .catch((err) => {
+    reject(err && err.message ? err.message : err.toString())
+  });
+});
+
 export default {
   selectUser,
   selectUserById,
@@ -163,5 +178,6 @@ export default {
   createUser,
   selectUsers,
   deleteUserById,
-  updateUserById
+  updateUserById,
+  updateUserByEmail
 };

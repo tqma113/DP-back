@@ -1,7 +1,7 @@
 type Mutation {
-  login(username: String!, password: String!): AuthResponse!
+  login(username: String!, password: String!): Response!
 
-  loginWithEmail(email: String!, code: String!, key: String!): AuthResponse
+  loginWithEmail(email: String!, code: String!, key: String!): Response!
 
   logout(username: String!): Response!
 
@@ -14,17 +14,17 @@ type Mutation {
     email: String!,
     statement: String!,
     u_key: String!,
-    e_key: String!): AuthResponse!
+    e_key: String!): Response!
   
-  checkUsername(username: String!): KeyResponse!
+  checkUsername(username: String!): Response!
   
-  setPassword(username: String!, password: String!, code: String!): Response!
+  setPassword(email: String!, password: String!, key: String!): Response!
 
-  sendEmailCode(email: String!): KeyResponse!
+  sendEmailCode(email: String!): Response!
 
-  sendEmailLoginCode(email: String!): KeyResponse!
+  sendEmailLoginCode(email: String!): Response!
 
-  ackEmail(email: String!, code: String!, key: String!): KeyResponse!
+  ackEmail(email: String!, code: String!, key: String!): Response!
 
-  uploadSingleImage(image: Upload!): UploadResponse!
+  uploadSingleImage(image: Upload!): Response!
 }

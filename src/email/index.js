@@ -3,20 +3,26 @@ import Code from './code'
 import createMessage from './message'
 import AckKey from './ackKey'
 
+const sendEmailAsync = (message) => new Promise((resolve, reject) => {
+  Transporter.sendMail(message, (error, info) => {
+    if (error) {
+      console.log('Error occurred');
+      console.log(error.message);
+      reject(false)
+    }
+
+    resolve(info)
+
+    console.log('Message sent successfully!');
+  });
+})
+
 
 const sendCode = async (accepter) => {
   let code = await Code.create(accepter)
   let message = createMessage(code, accepter)
 
-  let info = await Transporter.sendMail(message, (error, info) => {
-    if (error) {
-      console.log('Error occurred');
-      console.log(error.message);
-      throw error
-    }
-
-    console.log('Message sent successfully!');
-  });
+  let info = await sendEmailAsync(message)
 
   return info
 }

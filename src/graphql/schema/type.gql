@@ -110,7 +110,14 @@ type Extension {
   errors: [Error]!
 }
 
-interface Response {
+type Response {
+  url: String
+  key: String
+  code: String
+  sessionInfo: SessionInfo
+  user: User
+  token: String
+  username: String
   isSuccess: Boolean!
   extension: Extension!
 }
@@ -121,38 +128,6 @@ type Dynamics {
   comment: Comment
   user: User
   do_at: Date!
-}
-
-type AuthResponse implements Response {
-  token: String
-  username: String
-  isSuccess: Boolean!
-  extension: Extension!
-}
-
-type SessionResponse implements Response {
-  sessionInfo: SessionInfo!
-  user: User
-  isSuccess: Boolean!
-  extension: Extension!
-}
-
-type CodeResponse implements Response {
-  code: String!
-  isSuccess: Boolean!
-  extension: Extension!
-}
-
-type KeyResponse implements Response {
-  key: String!
-  isSuccess: Boolean!
-  extension: Extension!
-}
-
-type UploadResponse implements Response {
-  url: String!
-  isSuccess: Boolean!
-  extension: Extension!
 }
 
 enum Degree {
