@@ -1,6 +1,8 @@
 type Mutation {
   login(username: String!, password: String!): AuthResponse!
 
+  loginWithEmail(email: String!, code: String!, key: String!): AuthResponse
+
   logout(username: String!): Response!
 
   register(username: String!, 
@@ -19,6 +21,8 @@ type Mutation {
   setPassword(username: String!, password: String!, code: String!): Response!
 
   sendEmailCode(email: String!): KeyResponse!
+
+  sendEmailLoginCode(email: String!): KeyResponse!
 
   ackEmail(email: String!, code: String!, key: String!): KeyResponse!
 

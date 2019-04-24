@@ -40,7 +40,6 @@ const code = {
   check: async (email, code) => {
     if (await redis.exists(PREFIX + email)) {
       const varifyInfo = await redis.get(PREFIX + email)
-      await redis.delete(PREFIX + email)
       return isAvailable(varifyInfo) && varifyInfo.code === code
     } else {
       return false

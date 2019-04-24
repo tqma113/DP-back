@@ -100,6 +100,72 @@ export default {
     
     return response
   },
+  loginWithEmail: async (root, { email, code, key }, { dataSources, res }, info) => {
+    let response = {}
+    let errors = []
+    let user = {}
+
+    try {
+      user = (await dataSources.user.selectUser({ email }, ['username']))[0]
+      let isValidCode = await dataSources.Email.checkCode(email, code)
+      let isValidKey = await dataSources.CheckEmailKey.check(email, key)
+      let isValid = user && user.username && isValidCode && isValidKey
+  
+      if (isValid) {
+        let token = await dataSources.jwt.sign(user.username)
+  
+        response = {
+          token,
+          username,
+          isSuccess: true,
+          extension: {
+            operator: 'login',
+            errors
+          }
+        }
+        dataSources.Email.deleteCode(email)
+        dataSources.CheckEmailKey.delete(email)
+        let cookie = `customer=${user.username};username=${user.username};path=/;Expires=${moment().add(7, 'd').format('ddd, D MMM YYYY HH:mm:SS')} GMT;Secure;HttpOnly`
+        res.setHeader('Set-Cookie', cookie)
+      } else {
+        if (!user || !user.username) {
+          errors.push({
+            path: 'login.email',
+            message: 'email is not exist'
+          })
+        }
+
+        if (!isValidCode) {
+          errors.push({
+            path: 'login.email',
+            message: 'code is not right'
+          })
+        }
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'login',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      errors.push({
+        path: 'login',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: 'login',
+          errors
+        }
+      }
+    }
+    
+    return response
+  },
   register: async (root, { username, nickname, head_portrait, gender, location, birthday, email, statement, u_key, e_key}, { dataSources }, info) => {
     let newUser = {
       username,
@@ -136,6 +202,8 @@ export default {
             errors
           }
         }
+        dataSources.Email.AckKey.delete(email)
+        dataSources.CheckUsernameKey.delete(username)
       } else {
         if (!isValidUKey) {
           errors.push({
@@ -263,7 +331,7 @@ export default {
       }
     } catch(err) {
       errors.push({
-        path: 'checkUsername',
+        path: 'sendEmailCode',
         message: JSON.stringify(err)
       })
       response = {
@@ -271,6 +339,64 @@ export default {
         isSuccess: false,
         extension: {
           operator: "check email if usable&&send email code",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  sendEmailLoginCode: async (root, { email }, { dataSources }, info) => {
+    let response = {}
+    let errors = []
+    try {
+      let users = await dataSources.user.selectUserByEmail(email)
+      let isValid = users.length > 0 && !(await dataSources.CheckEmailKey.exists(email))
+
+      if (isValid) {
+        let key = await dataSources.CheckEmailKey.create(email)
+        let info = await dataSources.Email.sendCode(email)
+
+        response = {
+          key,
+          isSuccess: true,
+          extension: {
+            operator: "send email login code",
+            errors
+          }
+        }
+      } else {
+        if (users.length <= 0) {
+          errors.push({
+            path: 'sendEmailLoginCode',
+            message: 'email is not exist'
+          })
+        } else {
+          errors.push({
+            path: 'sendEmailLoginCode',
+            message: 'email has been send'
+          })
+        }
+        
+        response = {
+          key: '',
+          isSuccess: false,
+          extension: {
+            operator: "send email login code",
+            errors
+          }
+        }
+      }
+    } catch(err) {
+      errors.push({
+        path: 'sendEmailLoginCode',
+        message: JSON.stringify(err)
+      })
+      response = {
+        key: '',
+        isSuccess: false,
+        extension: {
+          operator: "send email login code",
           errors
         }
       }
@@ -297,6 +423,8 @@ export default {
             errors
           }
         }
+        dataSources.Email.deleteCode(email)
+        dataSources.CheckEmailKey.delete(email)
       } else {
         if (!isValidCode) {
           errors.push({
