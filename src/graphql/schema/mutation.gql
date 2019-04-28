@@ -17,6 +17,8 @@ type Mutation {
     e_key: String!): Response!
   
   checkUsername(username: String!): Response!
+
+  checkUsernameValid(username: String!): Response!
   
   setPassword(email: String!, password: String!, key: String!): Response!
 

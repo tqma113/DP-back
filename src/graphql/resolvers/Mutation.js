@@ -352,6 +352,52 @@ export default {
    
     return response
   },
+  checkUsernameValid: async (root, { username }, { dataSources }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let users = await dataSources.user.selectUserByUsername(username)
+      let isValid = users.length > 0
+
+      if (isValid) {
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: "check username if valid",
+            errors: []
+          }
+        }
+      } else {
+        errors.push({
+          path: 'checkUsernameValid',
+          message: 'is not exist'
+        })
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: "check username if valid",
+            errors
+          }
+        }
+      }
+    }  catch (err) {
+      errors.push({
+        path: 'checkUsernameValid',
+        message: JSON.stringify(err)
+      })
+      response = {
+        key: '',
+        isSuccess: false,
+        extension: {
+          operator: "check username if usable",
+          errors
+        }
+      }
+    }
+   
+    return response
+  },
   sendEmailCode: async (root, { email }, { dataSources }, info) => {
     let response = {}
     let errors = []
