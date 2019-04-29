@@ -10,10 +10,11 @@ const pool = mysql.createPool({
   connectTimeout: 1000000,
   stringifyObjects: true,
   typeCast: true,
+  acquireTimeout: 1000000
 })
 
 pool.on('acquire', function (connection) {
-  console.log('[MySQL] Connection %d acquired', connection.threadId);
+  // console.log('[MySQL] Connection %d acquired', connection.threadId);
 });
 
 pool.on('connection', function (connection) {
