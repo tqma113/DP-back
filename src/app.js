@@ -14,7 +14,8 @@ import child_process from 'child_process'
 // import { listenerCount } from 'cluster';
 
 import {
-  user
+  user,
+  category
 } from './database';
 
 import CheckUsernameKey from './key/check_username';
@@ -110,6 +111,7 @@ const apollo = new ApolloServer({
   dataSources: () => {
     return {
       user,
+      category,
       jwt,
       Email,
       CheckEmailKey,

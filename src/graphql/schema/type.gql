@@ -113,14 +113,17 @@ type Extension {
 type Response {
   url: String
   key: String
-  code: String
   sessionInfo: SessionInfo
   user: User
-  users: [User]!
   token: String
   username: String
+
+  users: [User]!
+  categorys: [Category]!
+
   isSuccess: Boolean!
   extension: Extension!
+  code: Int
 }
 
 type Dynamics {

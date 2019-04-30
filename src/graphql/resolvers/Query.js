@@ -131,4 +131,34 @@ export default {
 
     return response
   },
+  categorys: async (root, { }, { dataSources }, info) => {
+    let response = {}
+    let errors = []
+    try {
+      let categorys = await dataSources.category.selectCategory()
+      response = {
+        categorys,
+        isSuccess: true,
+        extension: {
+          operator: 'categorys query',
+          errors
+        }
+      }
+    } catch (err) {
+      errors.push({
+        path: 'users',
+        message: JSON.stringify(err)
+      })
+
+      response = {
+        isSuccess: false,
+        categorys: [],
+        extension: {
+          operator: "categorys query",
+          errors
+        }
+      }
+    }
+    return response
+  }
 }
