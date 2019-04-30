@@ -116,6 +116,7 @@ type Response {
   code: String
   sessionInfo: SessionInfo
   user: User
+  users: [User]!
   token: String
   username: String
   isSuccess: Boolean!

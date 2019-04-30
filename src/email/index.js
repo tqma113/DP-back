@@ -7,8 +7,9 @@ const sendEmailAsync = (message) => new Promise((resolve, reject) => {
   Transporter.sendMail(message, (error, info) => {
     if (error) {
       console.log('Error occurred');
-      console.log(error.message);
+      console.error(error.message);
       reject(false)
+      return
     }
 
     resolve(info)

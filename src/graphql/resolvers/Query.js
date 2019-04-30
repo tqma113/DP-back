@@ -68,7 +68,6 @@ export default {
         }
       }
     } catch (err) {
-      console.log(err)
       errors.push({
         path: 'register',
         message: JSON.stringify(err)
@@ -87,6 +86,49 @@ export default {
       }
     }
     
+    return response
+  },
+  users: async (root, { usernames }, { dataSources }, info) => {
+    let response = {}
+    let errors = []
+    try {
+      let promises = usernames.map(username => dataSources.user.selectUser({ username }))
+      let users = (await Promise.all(promises)).map(i => {
+        i[0].industry = []
+        i[0].eduBC = []
+        i[0].articles = []
+        i[0].categorys = []
+        i[0].concerned_categorys = []
+        i[0].concerned = []
+        i[0].likes = []
+        i[0].collections = []
+        i[0].dynamics = []
+        return i[0]
+      })
+      response = {
+        users,
+        isSuccess: true,
+        extension: {
+          operator: 'users query',
+          errors
+        }
+      }
+    } catch (err) {
+      errors.push({
+        path: 'users',
+        message: JSON.stringify(err)
+      })
+
+      response = {
+        isSuccess: false,
+        users: [],
+        extension: {
+          operator: "users query",
+          errors
+        }
+      }
+    }
+
     return response
   },
 }

@@ -622,7 +622,6 @@ export default {
         }
       }
     } catch (err) {
-      console.log(err)
       errors.push({
         path: 'ackEmail',
         message: JSON.stringify(err)

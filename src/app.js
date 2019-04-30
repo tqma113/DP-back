@@ -50,6 +50,7 @@ const apollo = new ApolloServer({
     // keepAlive: 20,
     onConnect: (connectionParams, webSocket) => {
       // TODO GraphQL鉴权还是逻辑中健全?
+      console.log('Subscription Connected!')
 
       // GraphQL鉴权
       // if (connectionParams.authToken) {

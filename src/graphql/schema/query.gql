@@ -1,3 +1,5 @@
 type Query {
   checkLoginState(username: ID!, token: String!): Response!
+
+  users(usernames: [String!]!): Response!
 }
