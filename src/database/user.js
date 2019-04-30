@@ -100,11 +100,11 @@ const selectUsers = () => new Promise((resolve, reject) => {
 
 const createUser = (user) => new Promise((resolve, reject) => {
   query({
-    sql: 'INSERT INTO `user` (`username`, `nickname`, `head_portrait`, `gender`, `location`, `birthday`,  `email`, `statement`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+    sql: 'INSERT INTO `user` (`username`, `nickname`, `avatar`, `gender`, `location`, `birthday`,  `email`, `statement`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
     values: [
       user.username,
       user.nickname,
-      user.head_portrait,
+      user.avatar,
       user.gender,
       user.location,
       user.birthday,

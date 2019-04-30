@@ -174,11 +174,11 @@ export default {
     
     return response
   },
-  register: async (root, { username, nickname, head_portrait, gender, location, birthday, email, statement, u_key, e_key}, { dataSources }, info) => {
+  register: async (root, { username, nickname, avatar, gender, location, birthday, email, statement, u_key, e_key}, { dataSources }, info) => {
     let newUser = {
       username,
       nickname,
-      head_portrait,
+      avatar,
       gender,
       location,
       birthday,

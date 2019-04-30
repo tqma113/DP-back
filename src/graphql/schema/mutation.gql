@@ -7,9 +7,9 @@ type Mutation {
 
   register(username: String!, 
     nickname: String!, 
-    hd_portrial: String!, 
+    avatar: String!, 
     gender: String!, 
-    address: String!, 
+    location: String!, 
     birthday: Date!,
     email: String!,
     statement: String!,

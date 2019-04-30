@@ -8,7 +8,7 @@ type User {
   industry: [Industry]!
   register_at: Date!
   last_login_at: Date!
-  head_portrait: String
+  avatar: String
   statement: String
   email: String!
   eduBC: [EduBC]!
