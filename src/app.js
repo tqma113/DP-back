@@ -15,7 +15,9 @@ import child_process from 'child_process'
 
 import {
   user,
-  category
+  category,
+  article,
+  articleCategory
 } from './database';
 
 import CheckUsernameKey from './key/check_username';
@@ -112,6 +114,8 @@ const apollo = new ApolloServer({
     return {
       user,
       category,
+      article,
+      articleCategory,
       jwt,
       Email,
       CheckEmailKey,

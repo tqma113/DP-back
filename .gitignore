@@ -22,4 +22,4 @@ yarn-error.log*
 *.log*
 
 # static
-/src/public/image/*
+/src/public/

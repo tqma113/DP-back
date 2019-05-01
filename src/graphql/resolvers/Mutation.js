@@ -8,6 +8,7 @@ const USER_UPDATED = 'USER_UPDATED';
 const USER_DELETED = 'USER_DELETED';
 
 const IMAGE_LOAD_PATH = __dirname + '/../../public/image'
+const JSON_LOAD_PATH = __dirname + '/../../public/JSON'
 
 const pubsub = new PubSub();
 
@@ -23,6 +24,17 @@ const getRandomFilename = (mimetype) => {
   return filename + suffix
 }
 
+const getRandomFilenameWithSuffix = (suffix) => {
+  const all = 'qwertyuiopasdfghjklzxcvbnm-1234567890'
+  let filename = ''
+
+  for(let i = 0;i < 36;i++) {
+    filename += all[parseInt(Math.random() * (all.length - 1))]
+  }
+
+  return filename + suffix
+}
+
 const writeWithStream = (stream, mimetype) => new Promise((resolve, reject) => {
   let filename = getRandomFilename(mimetype)
   let out = fs.createWriteStream(path.resolve(IMAGE_LOAD_PATH, filename))
@@ -30,6 +42,18 @@ const writeWithStream = (stream, mimetype) => new Promise((resolve, reject) => {
   stream.on('data', data => out.write(data))
   stream.on('end', () => resolve('image/' + filename))
   stream.on('error', reject)
+})
+
+const writeJSONSync = (buffer) => new Promise((resolve, reject) => {
+  let filename = getRandomFilenameWithSuffix('.json')
+
+  fs.writeFile(path.resolve(JSON_LOAD_PATH, filename), buffer, { flag: "a" }, function (err) {
+    if(err){
+        reject(err);
+    }else {
+        resolve(filename)
+    }
+  })
 })
 
 export default {
@@ -632,6 +656,141 @@ export default {
         isSuccess: false,
         extension: {
           operator: "upload file",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  createArticle: async (root, { title, abstract, content, username, token, categoryIds }, { dataSources }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let user = (await dataSources.user.selectUser({ username }, []))[0]
+      let sessionInfo = await dataSources.jwt.verify(username, token)
+      let isValid = !!sessionInfo && user && title && abstract && content && true
+
+      if (isValid) {
+        let contentName = await writeJSONSync(content)
+        let article = {
+          title,
+          abstract,
+          user_id: user.id,
+          content: contentName
+        }
+
+        let newArticle = await dataSources.article.createArticle(article)
+
+        if (newArticle) {
+
+          let categorys = await dataSources.articleCategory.createArticleCategorys(newArticle.id, categoryIds)
+          if (categorys.affectedRows=== categoryIds.length) {
+            newArticle.user = user
+            newArticle.project_link = []
+            newArticle.category = categoryIds
+            newArticle.industrys = []
+            newArticle.comments = []
+            newArticle.likes = 0
+            newArticle.collections = 0
+    
+            response = {
+              article: newArticle,
+              isSuccess: true,
+              extension: {
+                operator: 'createArticle',
+                errors
+              }
+            }
+          } else {
+            dataSources.article.deleteArticleById(newArticle.id)
+            errors.push({
+              path: 'createArticle',
+              message: 'article category setfail'
+            })
+      
+            response = {
+              article: {},
+              isSuccess: false,
+              extension: {
+                operator: "create article",
+                errors
+              }
+            }
+          }
+        } else {
+          errors.push({
+            path: 'createArticle',
+            message: 'createArticle fail'
+          })
+    
+          response = {
+            article: {},
+            isSuccess: false,
+            extension: {
+              operator: "create article",
+              errors
+            }
+          }
+        }
+      } else {
+        if (!user) {
+          errors.push({
+            path: 'createArticle.username',
+            message: 'username is not exist'
+          })
+        }
+        
+        if (!sessionInfo) {
+          errors.push({
+            path: 'createArticle.token',
+            message: 'token is invalid'
+          })
+        }
+
+        if (!title) {
+          errors.push({
+            path: 'createArticle.title',
+            message: 'title is invalid'
+          })
+        }
+
+        if (!abstract) {
+          errors.push({
+            path: 'createArticle.abstract',
+            message: 'abstract is invalid'
+          })
+        }
+
+        if (!content) {
+          errors.push({
+            path: 'createArticle.content',
+            message: 'content is invalid'
+          })
+        }
+
+        response = {
+          article: {},
+          isSuccess: false,
+          extension: {
+            operator: 'createArticle',
+            errors
+          }
+        }
+      }
+
+    } catch (err) {
+      errors.push({
+        path: 'createArticle',
+        message: JSON.stringify(err)
+      })
+
+      response = {
+        article: {},
+        isSuccess: false,
+        extension: {
+          operator: "create article",
           errors
         }
       }

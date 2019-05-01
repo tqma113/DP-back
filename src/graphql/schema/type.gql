@@ -53,18 +53,18 @@ type Category {
 
 type Article {
   id: ID!
-  titile: String!
+  title: String!
   abstract: String!
-  content: String!
-  release_at: Date!
-  last_modify_at: Date!
-  user: User!
-  project_link: [String]!
-  categorys: [Category]!
-  industrys: [Industry]!
-  comments: [Comment]!
-  likes: Int!
-  collections: Int!
+  content: String
+  release_at: Date
+  last_modify_at: Date
+  user: User
+  project_link: [String]
+  categorys: [Category]
+  industrys: [Industry]
+  comments: [Comment]
+  likes: Int
+  collections: Int
 }
 
 
@@ -111,15 +111,18 @@ type Extension {
 }
 
 type Response {
-  url: String
   key: String
-  sessionInfo: SessionInfo
-  user: User
   token: String
-  username: String
 
-  users: [User]!
-  categorys: [Category]!
+  username: String
+  url: String
+  sessionInfo: SessionInfo
+
+  user: User
+  article: Article
+
+  users: [User]
+  categorys: [Category]
 
   isSuccess: Boolean!
   extension: Extension!

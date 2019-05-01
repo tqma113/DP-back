@@ -29,7 +29,7 @@
   "scripts": {
     "test": "nodemon --exec babel-node -- src/test.js",
     "start": "nodemon src/app.js",
-    "nodemon-start": "nodemon --exec babel-node -- src/app.js"
+    "nodemon:start": "lsof -i tcp:4000 | sed -n '3p' | awk '$1==\"node\" {printf $2}' | xargs kill&&nodemon --exec babel-node -- src/app.js"
   },
   "repository": {
     "type": "git",

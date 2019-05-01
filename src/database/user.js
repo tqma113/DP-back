@@ -33,6 +33,30 @@ const selectUser = (conditions, results) => new Promise((resolve, reject) => {
   });
 });
 
+const selectUsersByUsernames = (usernameArr) => new Promise((resolve, reject) => {
+  let sql = 'SELECT * FROM `user`'
+  if (usernameArr && usernameArr.length && usernameArr.length > 0) {
+    sql += ' WHERE `username` in (' + usernameArr.map(i => `'${i}'`).join(', ') + ')'
+  }
+  query({
+    sql,
+    values: usernameArr
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
 const selectUserById = (id) => new Promise((resolve, reject) => {
   query({
     sql: 'SELECT * FROM `user` WHERE `id` = ?',
@@ -179,5 +203,6 @@ export default {
   selectUsers,
   deleteUserById,
   updateUserById,
-  updateUserByEmail
+  updateUserByEmail,
+  selectUsersByUsernames
 };

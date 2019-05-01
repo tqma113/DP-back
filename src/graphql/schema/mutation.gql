@@ -5,7 +5,8 @@ type Mutation {
 
   logout(username: String!): Response!
 
-  register(username: String!, 
+  register(
+    username: String!, 
     nickname: String!, 
     avatar: String!, 
     gender: String!, 
@@ -14,7 +15,8 @@ type Mutation {
     email: String!,
     statement: String!,
     u_key: String!,
-    e_key: String!): Response!
+    e_key: String!
+  ): Response!
   
   checkUsername(username: String!): Response!
 
@@ -29,4 +31,13 @@ type Mutation {
   ackEmail(email: String!, code: String!, key: String!): Response!
 
   uploadSingleImage(image: Upload!): Response!
+
+  createArticle(
+    title: String!,
+    abstract: String!,
+    content: String!,
+    username: String!,
+    token: String!,
+    categoryIds: [Int]!
+  ): Response!
 }
