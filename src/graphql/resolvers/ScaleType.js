@@ -1,5 +1,6 @@
 import { GraphQLScalarType } from 'graphql';
 const { Kind } = require('graphql/language');
+import GraphQLJSON, { GraphQLJSONObject } from 'graphql-type-json';
 
 export default {
   Date: new GraphQLScalarType({
@@ -24,5 +25,7 @@ export default {
       }
       return null;
     }
-  })
+  }),
+  JSON: GraphQLJSON,
+  JSONObject: GraphQLJSONObject
 }

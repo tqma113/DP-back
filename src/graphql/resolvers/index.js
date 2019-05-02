@@ -8,7 +8,9 @@ const resolvers = {
   Mutation,
   Subscription,
   
-  Date: ScaleType.Date
+  Date: ScaleType.Date,
+  JSON: ScaleType.JSON,
+  JSONObject: ScaleType.JSONObject
 };
 
 export default resolvers;

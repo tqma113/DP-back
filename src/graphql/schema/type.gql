@@ -16,9 +16,9 @@ type User {
   emRecords: [EmRecord]!
   categorys: [Category]!
   concerned_categorys: [Category]!
-  concerned: [User]!
-  likes: [Article]!
-  collections: [Article]!
+  concerned: [Concern]!
+  likes: [Like]!
+  collections: [Collect]!
   dynamics: [Dynamics]!
 }
 
@@ -56,22 +56,49 @@ type Category {
   description: String
 }
 
+type Like {
+  id: ID!
+  create_time: Date
+  user_id: Int
+  article_id: Int
+  comment_id: Int
+  user: User
+  article: Article
+  comment: Comment
+}
+
+type Collect {
+  id: ID!
+  create_time: Date
+  user_id: Int
+  article_id: Int
+  user: User
+  article: Article
+}
+
+type Concern {
+  id: ID!
+  user_id: Int
+  concern_user_id: Int
+  user: User
+  concern_user: User
+  create_time: Date
+}
+
 type Article {
   id: ID!
   title: String!
   abstract: String!
-  content: String
-  release_at: Date
-  last_modify_at: Date
+  content: JSON
+  release_time: Date
+  last_modify_time: Date
   user: User
   project_link: [String]
   categorys: [Category]
-  industrys: [Industry]
   comments: [Comment]
-  likes: Int
-  collections: Int
+  likes: [Like]
+  collections: [Collect]
 }
-
 
 type Comment {
   id: ID!
@@ -80,8 +107,8 @@ type Comment {
   article: Article
   comments: [Comment]
   comment: Comment
-  create_at: Date
-  likes: Int
+  create_time: Date
+  likes: [Like]
 }
 
 type Message {
@@ -170,3 +197,5 @@ type File {
 }
 
 scalar Date
+scalar JSON
+scalar JSONObject

@@ -40,4 +40,8 @@ type Mutation {
     token: String!,
     categoryIds: [Int]!
   ): Response!
+
+  checkArticleIdValid(id: Int!): Response
+
+  sendComment(username: String!, token: String!, content: String!, articleId: Int!): Response
 }

@@ -217,8 +217,17 @@ export default {
     try {
       let partArticles = await dataSources.database.article.selectArticlesByIds(idList)
       let articles = partArticles.map(async item => {
-        let content = await readJSONAsync(item.content)
-        item.content = content
+        item.content = JSON.parse(await readJSONAsync(item.content))
+        item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
+        item.categorys = (await dataSources.database.articleCategory.selectArticleCategorysByArticleId(item.id)).map(item => ({ id: item.category_id}))
+        item.collections = await dataSources.database.articleCollection.selectArticleCollectionsByArticleId(item.id)
+        item.comments = (await dataSources.database.comment.selectCommentsById((await dataSources.database.articleComment.selectArticleCommentsByArticleId(item.id)).map(item => item.comment_id))).map(async item => {
+          item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
+          item.likes = await dataSources.database.commentLike.selectCommentLikeByCommentId(item.id)
+          return item
+        })
+        item.likes = await dataSources.database.articleLike.selectArticleLikesByArticleId(item.id)
+        item.project_link = (await dataSources.database.projectLink.selectProjectLinkByArticleId(item.id)).map(item => item.link)
         return item
       })
       response = {

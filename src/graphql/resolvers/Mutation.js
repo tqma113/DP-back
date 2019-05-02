@@ -405,13 +405,12 @@ export default {
           }
         }
       }
-    }  catch (err) {
+    } catch (err) {
       errors.push({
         path: 'checkUsernameValid',
         message: JSON.stringify(err)
       })
       response = {
-        key: '',
         isSuccess: false,
         extension: {
           operator: "check username if usable",
@@ -798,4 +797,115 @@ export default {
 
     return response
   },
+  checkArticleIdValid: async (root, { id }, { dataSources }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let article = (await dataSources.database.article.selectArticlesByIds([id]))[0]
+
+      if (article) {
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: "check article id if usable",
+            errors
+          }
+        }
+      } else {
+        errors.push({
+          path: 'checkArticleIdValid',
+          message: 'article is not exist'
+        })
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: "check article id if usable",
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      errors.push({
+        path: 'checkArticleIdValid',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "check article id if usable",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  sendComment: async (root, { username, token, content, articleId }, { dataSources }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let user = (await dataSources.database.user.selectUser({ username }, ['id']))[0]
+      let sessionInfo = await dataSources.jwt.verify(username, token)
+      let isValid = !!sessionInfo && user
+
+      if (isValid) {
+        let info = await dataSources.database.comment.createComment(user.id, content)
+        await dataSources.database.articleComment.createArticleComments(articleId, [info.insertId])
+        
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'sendComment',
+            errors
+          }
+        }
+      } else {
+        if (!user) {
+          errors.push({
+            path: 'sendComment.username',
+            message: 'username is not exist'
+          })
+        }
+        
+        if (!sessionInfo) {
+          errors.push({
+            path: 'sendComment.token',
+            message: 'token is invalid'
+          })
+        }
+
+        response = {
+          sessionInfo: {
+            username,
+            tiken: '',
+            isRefresh: false
+          },
+          isSuccess: false,
+          extension: {
+            operator: 'sendComment',
+            errors
+          }
+        }
+      }
+      
+      
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'sendComment',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "send comment",
+          errors
+        }
+      }
+    }
+
+    return response
+  }
 }
