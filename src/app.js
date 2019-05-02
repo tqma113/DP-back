@@ -13,12 +13,7 @@ import child_process from 'child_process'
 // import multer from 'multer'
 // import { listenerCount } from 'cluster';
 
-import {
-  user,
-  category,
-  article,
-  articleCategory
-} from './database';
+import database from './database';
 
 import CheckUsernameKey from './key/check_username';
 import CheckEmailKey from './key/check_email'
@@ -112,10 +107,7 @@ const apollo = new ApolloServer({
   },
   dataSources: () => {
     return {
-      user,
-      category,
-      article,
-      articleCategory,
+      database,
       jwt,
       Email,
       CheckEmailKey,

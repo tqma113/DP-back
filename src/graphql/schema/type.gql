@@ -11,8 +11,9 @@ type User {
   avatar: String
   statement: String
   email: String!
-  eduBC: [EduBC]!
+  eduBG: [EduBG]!
   articles: [Article]!
+  emRecords: [EmRecord]!
   categorys: [Category]!
   concerned_categorys: [Category]!
   concerned: [User]!
@@ -21,15 +22,19 @@ type User {
   dynamics: [Dynamics]!
 }
 
-type EduBC {
-  school: String!
-  major: String!
-  degree: Degree!
+type EduBG {
+  id: Int!
+  school: String
+  major: String
+  degree: Degree
+  user_id: Int!
 }
 
 type EmRecord {
+  id: Int!
   company: String!
   position: String!
+  user_id: Int!
 }
 
 type SecQuestion {
@@ -40,15 +45,15 @@ type SecQuestion {
 
 type Industry {
   id: ID!
-  name: String!
-  description: String!
-  image: String!
+  name: String
+  description: String
+  image: String
 }
 
 type Category {
   id: ID!
-  subject: String!
-  description: String!
+  subject: String
+  description: String
 }
 
 type Article {
@@ -70,21 +75,21 @@ type Article {
 
 type Comment {
   id: ID!
-  content: String!
-  user: User!
-  article: Article!
-  comments: [Comment]!
-  comment: Comment!
-  create_at: Date!
-  likes: Int!
+  content: String
+  user: User
+  article: Article
+  comments: [Comment]
+  comment: Comment
+  create_at: Date
+  likes: Int
 }
 
 type Message {
   id: ID!
-  send_user: User!
-  accept_user: User!
-  content: String!
-  send_at: Date!
+  send_user: User
+  accept_user: User
+  content: String
+  send_at: Date
 }
 
 type SessionInfo {
@@ -123,6 +128,7 @@ type Response {
 
   users: [User]
   categorys: [Category]
+  industrys: [Industry]
   articles: [Article]
 
   isSuccess: Boolean!

@@ -22,20 +22,20 @@ export default {
       let user = {}
 
       if (username.indexOf('@') !== -1) {
-        user = (await dataSources.user.selectUser({ email: username }, ['password']))[0]
+        user = (await dataSources.database.user.selectUser({ email: username }, ['password']))[0]
       } else {
-        user = (await dataSources.user.selectUser({ username }, ['password']))[0]
+        user = (await dataSources.database.user.selectUser({ username }, ['password']))[0]
       }
   
       let sessionInfo = await dataSources.jwt.verify(username, token)
       let isValid = !!sessionInfo && user
 
       if (isValid) {
-        user = (await dataSources.user.selectUser({ username }, []))[0]
+        user = (await dataSources.database.user.selectUser({ username }, []))[0]
         user.industry = []
-        user.eduBC = []
-        cosnole.log(user.id)
-        user.articles = await dataSources.article.selectArticlesByUserIds([user.id])
+        user.eduBG = []
+        user.emRecords = []
+        user.articles = await dataSources.database.article.selectArticlesByUserIds([user.id])
         user.categorys = []
         user.concerned_categorys = []
         user.concerned = []
@@ -110,8 +110,9 @@ export default {
     let errors = []
     const queryAsync = async (i) => {
       i.industry = []
-      i.eduBC = []
-      i.articles = await dataSources.article.selectArticlesByUserIds([i.id])
+      i.eduBG = []
+      i.emRecords = []
+      i.articles = await dataSources.database.article.selectArticlesByUserIds([i.id])
       i.categorys = []
       i.concerned_categorys = []
       i.concerned = []
@@ -121,7 +122,7 @@ export default {
       return i
     }
     try {
-      let promises = usernames.map(username => dataSources.user.selectUser({ username }))
+      let promises = usernames.map(username => dataSources.database.user.selectUser({ username }))
       let users = await Promise.all((await Promise.all(promises)).map(i => queryAsync(i[0])))
       response = {
         users,
@@ -153,7 +154,7 @@ export default {
     let response = {}
     let errors = []
     try {
-      let categorys = await dataSources.category.selectCategory()
+      let categorys = await dataSources.database.category.selectCategory()
       response = {
         categorys,
         isSuccess: true,
@@ -164,7 +165,7 @@ export default {
       }
     } catch (err) {
       errors.push({
-        path: 'users',
+        path: 'categorys',
         message: JSON.stringify(err)
       })
 
@@ -179,12 +180,42 @@ export default {
     }
     return response
   },
+  industrys: async (root, { }, { dataSources }, info) => {
+    let response = {}
+    let errors = []
+    try {
+      let industrys = await dataSources.database.industry.selectIndustry()
+      response = {
+        industrys,
+        isSuccess: true,
+        extension: {
+          operator: 'industrys query',
+          errors
+        }
+      }
+    } catch (err) {
+      errors.push({
+        path: 'industrys',
+        message: JSON.stringify(err)
+      })
+
+      response = {
+        isSuccess: false,
+        industrys: [],
+        extension: {
+          operator: "industrys query",
+          errors
+        }
+      }
+    }
+    return response
+  },
   articles: async (root, { idList }, { dataSources }, info) => {
     let response = {}
     let errors = []
 
     try {
-      let partArticles = await dataSources.article.selectArticlesByIds(idList)
+      let partArticles = await dataSources.database.article.selectArticlesByIds(idList)
       let articles = partArticles.map(async item => {
         let content = await readJSONAsync(item.content)
         item.content = content

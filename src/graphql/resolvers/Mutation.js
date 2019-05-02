@@ -64,9 +64,9 @@ export default {
 
     try {
       if (username.indexOf('@') !== -1) {
-        user = (await dataSources.user.selectUser({ email: username }, ['password']))[0]
+        user = (await dataSources.database.user.selectUser({ email: username }, ['password']))[0]
       } else {
-        user = (await dataSources.user.selectUser({ username }, ['password']))[0]
+        user = (await dataSources.database.user.selectUser({ username }, ['password']))[0]
       }
   
       let isValid = user && user.password && user.password === password
@@ -130,7 +130,7 @@ export default {
     let user = {}
 
     try {
-      user = (await dataSources.user.selectUser({ email }, ['username']))[0]
+      user = (await dataSources.database.user.selectUser({ email }, ['username']))[0]
       let isValidCode = await dataSources.Email.checkCode(email, code)
       let isValidKey = await dataSources.CheckEmailKey.check(email, key)
       let isValid = user && user.username && isValidCode && isValidKey
@@ -222,7 +222,7 @@ export default {
         await dataSources.CheckUsernameKey.delete(username)
         await dataSources.Email.AckKey.delete(email)
   
-        let user = await dataSources.user.createUser(newUser)
+        let user = await dataSources.database.user.createUser(newUser)
         let token = await dataSources.jwt.sign(username)
         
         response = {
@@ -277,12 +277,12 @@ export default {
     let errors = []
 
     try {
-      let user = (await dataSources.user.selectUser({ email }, ['username']))[0]
+      let user = (await dataSources.database.user.selectUser({ email }, ['username']))[0]
       let isValidEKey = await dataSources.Email.AckKey.check(email, key);
       let isValid = user && isValidEKey
 
       if (isValid) {
-        await dataSources.user.updateUserByEmail(email, 'password', password)
+        await dataSources.database.user.updateUserByEmail(email, 'password', password)
         response = {
           isSuccess: true,
           extension: {
@@ -332,7 +332,7 @@ export default {
     let errors = []
 
     try {
-      let users = await dataSources.user.selectUserByUsername(username)
+      let users = await dataSources.database.user.selectUserByUsername(username)
       let isValid = users.length === 0 && !(await dataSources.CheckUsernameKey.exists(username))
 
       if (isValid) {
@@ -381,7 +381,7 @@ export default {
     let errors = []
 
     try {
-      let users = await dataSources.user.selectUserByUsername(username)
+      let users = await dataSources.database.user.selectUserByUsername(username)
       let isValid = users.length > 0
 
       if (isValid) {
@@ -426,7 +426,7 @@ export default {
     let response = {}
     let errors = []
     try {
-      let users = await dataSources.user.selectUserByEmail(email)
+      let users = await dataSources.database.user.selectUserByEmail(email)
       let isValid = users.length === 0 && !(await dataSources.CheckEmailKey.exists(email))
 
       if (isValid) {
@@ -491,7 +491,7 @@ export default {
     let response = {}
     let errors = []
     try {
-      let users = await dataSources.user.selectUserByEmail(email)
+      let users = await dataSources.database.user.selectUserByEmail(email)
       let isValid = users.length > 0 && !(await dataSources.CheckEmailKey.exists(email))
 
       if (isValid) {
@@ -668,7 +668,7 @@ export default {
     let errors = []
 
     try {
-      let user = (await dataSources.user.selectUser({ username }, []))[0]
+      let user = (await dataSources.database.user.selectUser({ username }, []))[0]
       let sessionInfo = await dataSources.jwt.verify(username, token)
       let isValid = !!sessionInfo && user && title && abstract && content && true
 
@@ -681,11 +681,11 @@ export default {
           content: contentName
         }
 
-        let newArticle = await dataSources.article.createArticle(article)
+        let newArticle = await dataSources.database.article.createArticle(article)
 
         if (newArticle) {
 
-          let categorys = await dataSources.articleCategory.createArticleCategorys(newArticle.id, categoryIds)
+          let categorys = await dataSources.database.articleCategory.createArticleCategorys(newArticle.id, categoryIds)
           if (categorys.affectedRows=== categoryIds.length) {
             newArticle.user = user
             newArticle.project_link = []
@@ -704,7 +704,7 @@ export default {
               }
             }
           } else {
-            dataSources.article.deleteArticleById(newArticle.id)
+            dataSources.database.article.deleteArticleById(newArticle.id)
             errors.push({
               path: 'createArticle',
               message: 'article category setfail'

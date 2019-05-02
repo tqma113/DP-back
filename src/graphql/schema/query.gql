@@ -5,5 +5,7 @@ type Query {
 
   categorys: Response!
 
+  industrys: Response!
+
   articles(idList: [Int!]!): Response!
 }
