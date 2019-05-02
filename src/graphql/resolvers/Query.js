@@ -1,3 +1,19 @@
+
+import fs from 'fs'
+import path from 'path'
+
+const JSON_LOAD_PATH = __dirname + '/../../public/JSON'
+
+const readJSONAsync = (filename) => new Promise((resolve, reject) => {
+  fs.readFile(path.resolve(JSON_LOAD_PATH, filename),'utf-8',function(err,data){
+    if(err){
+        reject(err);
+    }else{
+        resolve(data);
+    }
+});
+})
+
 export default {
   checkLoginState: async (root, { username, token }, { dataSources }, info) => {
     let response = {}
@@ -18,7 +34,8 @@ export default {
         user = (await dataSources.user.selectUser({ username }, []))[0]
         user.industry = []
         user.eduBC = []
-        user.articles = []
+        cosnole.log(user.id)
+        user.articles = await dataSources.article.selectArticlesByUserIds([user.id])
         user.categorys = []
         user.concerned_categorys = []
         user.concerned = []
@@ -91,20 +108,21 @@ export default {
   users: async (root, { usernames }, { dataSources }, info) => {
     let response = {}
     let errors = []
+    const queryAsync = async (i) => {
+      i.industry = []
+      i.eduBC = []
+      i.articles = await dataSources.article.selectArticlesByUserIds([i.id])
+      i.categorys = []
+      i.concerned_categorys = []
+      i.concerned = []
+      i.likes = []
+      i.collections = []
+      i.dynamics = []
+      return i
+    }
     try {
       let promises = usernames.map(username => dataSources.user.selectUser({ username }))
-      let users = (await Promise.all(promises)).map(i => {
-        i[0].industry = []
-        i[0].eduBC = []
-        i[0].articles = []
-        i[0].categorys = []
-        i[0].concerned_categorys = []
-        i[0].concerned = []
-        i[0].likes = []
-        i[0].collections = []
-        i[0].dynamics = []
-        return i[0]
-      })
+      let users = await Promise.all((await Promise.all(promises)).map(i => queryAsync(i[0])))
       response = {
         users,
         isSuccess: true,
@@ -159,6 +177,43 @@ export default {
         }
       }
     }
+    return response
+  },
+  articles: async (root, { idList }, { dataSources }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let partArticles = await dataSources.article.selectArticlesByIds(idList)
+      let articles = partArticles.map(async item => {
+        let content = await readJSONAsync(item.content)
+        item.content = content
+        return item
+      })
+      response = {
+        isSuccess: true,
+        articles,
+        extension: {
+          operator: "articles query",
+          errors
+        }
+      }
+    } catch (err) {
+      errors.push({
+        path: 'users',
+        message: JSON.stringify(err)
+      })
+
+      response = {
+        isSuccess: false,
+        articles: [],
+        extension: {
+          operator: "articles query",
+          errors
+        }
+      }
+    }
+
     return response
   }
 }

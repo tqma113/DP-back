@@ -212,10 +212,10 @@ if (config.ssl) {
 apollo.installSubscriptionHandlers(server)
 
 // Start redis clear
-const redisClearProcess = child_process.fork(redisClear)
-redisClearProcess.on('message', (message) => {
-  console.log('[Redis]', message)
-})
+// const redisClearProcess = child_process.fork(redisClear)
+// redisClearProcess.on('message', (message) => {
+//   console.log('[Redis]', message)
+// })
 
 server.listen({ port: config.port }, () => {
   console.log(

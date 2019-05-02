@@ -123,6 +123,7 @@ type Response {
 
   users: [User]
   categorys: [Category]
+  articles: [Article]
 
   isSuccess: Boolean!
   extension: Extension!

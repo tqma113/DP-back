@@ -50,7 +50,7 @@ const selectArticlesByUserIds = (idArr) => new Promise((resolve, reject) => {
   }
   query({
     sql,
-    values: [id]
+    values: []
   })
   .then((res) => {
     if(res) {

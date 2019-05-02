@@ -17,12 +17,13 @@ const createArticleCategorys = (articleId, categoryIds) => new Promise((resolve,
   });
 })
 
-const selectArticleCategorysByArticleId = (article_id) => new Promise((resolve, reject) => {
+const selectArticleCategorysByUserId = (article_id) => new Promise((resolve, reject) => {
   query({
     sql: 'SELECT * FROM `article_category` WHERE `article_id` = ?',
     values: [article_id]
   })
   .then((res) => {
+    console.log(article_id,res)
     if(res) {
       resolve(res)
     } else {
@@ -39,5 +40,5 @@ const selectArticleCategorysByArticleId = (article_id) => new Promise((resolve, 
 
 export default {
   createArticleCategorys,
-  selectArticleCategorysByArticleId
+  selectArticleCategorysByUserId
 }
