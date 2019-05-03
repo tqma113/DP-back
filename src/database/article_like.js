@@ -57,8 +57,30 @@ const selectArticleLikesByUserId = (user_id) => new Promise((resolve, reject) =>
   });
 });
 
+const deleteArticleLikes = (articleId, userIds) => new Promise((resolve, reject) => {
+  let sql = userIds.map(item => 'DELETE FROM `article_like` WHERE `article_id` = '+ articleId + ' AND `user_id` = ' + item).join(';')
+  query({
+    sql,
+    values: []
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err && err.message ? err.message : err.toString())
+  });
+});
+
 export default {
   createArticleLikes,
   selectArticleLikesByArticleId,
-  selectArticleLikesByUserId
+  selectArticleLikesByUserId,
+  deleteArticleLikes
 }

@@ -57,8 +57,30 @@ const selectArticleCollectionsByUserId = (user_id) => new Promise((resolve, reje
   });
 });
 
+const deleteArticleCollections = (articleId, userIds) => new Promise((resolve, reject) => {
+  let sql = userIds.map(item => 'DELETE FROM `article_collected` WHERE `article_id` = '+ articleId + ' AND `user_id` = ' + item).join(';')
+  query({
+    sql,
+    values: []
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err && err.message ? err.message : err.toString())
+  });
+});
+
 export default {
   createArticleCollections,
   selectArticleCollectionsByArticleId,
-  selectArticleCollectionsByUserId
+  selectArticleCollectionsByUserId,
+  deleteArticleCollections
 }

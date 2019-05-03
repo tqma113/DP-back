@@ -44,4 +44,8 @@ type Mutation {
   checkArticleIdValid(id: Int!): Response
 
   sendComment(username: String!, token: String!, content: String!, articleId: Int!): Response
+
+  articleStar(username: String!, token: String!, articleId: Int!, status: Boolean!): Response
+
+  articleLike(username: String!, token: String!, articleId: Int!, status: Boolean!): Response
 }

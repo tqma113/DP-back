@@ -892,7 +892,6 @@ export default {
       
       
     } catch (err) {
-      console.log(err)
       errors.push({
         path: 'sendComment',
         message: JSON.stringify(err)
@@ -907,5 +906,140 @@ export default {
     }
 
     return response
-  }
+  },
+  articleStar: async (root, { username, token, articleId, status }, { dataSources }, Info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let user = (await dataSources.database.user.selectUser({ username }, ['id']))[0]
+      let sessionInfo = await dataSources.jwt.verify(username, token)
+      let isValid = !!sessionInfo && user
+
+      if (isValid) {
+        if (status) {
+          await dataSources.database.articleCollection.deleteArticleCollections(articleId, [user.id])
+        } else {
+          await dataSources.database.articleCollection.createArticleCollections(articleId, [user.id])
+        }
+
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'article star',
+            errors
+          }
+        }
+      } else {
+        if (!user) {
+          errors.push({
+            path: 'articleStar.username',
+            message: 'username is not exist'
+          })
+        }
+        
+        if (!sessionInfo) {
+          errors.push({
+            path: 'articleStar.token',
+            message: 'token is invalid'
+          })
+        }
+
+        response = {
+          sessionInfo: {
+            username,
+            tiken: '',
+            isRefresh: false
+          },
+          isSuccess: false,
+          extension: {
+            operator: 'articleStar',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'articleStar',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "article star",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  articleLike: async (root, { username, token, articleId, status = false }, { dataSources }, Info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let user = (await dataSources.database.user.selectUser({ username }, ['id']))[0]
+      let sessionInfo = await dataSources.jwt.verify(username, token)
+      let isValid = !!sessionInfo && user
+
+      if (isValid) {
+        if (status) {
+          await dataSources.database.articleLike.deleteArticleLikes(articleId, [user.id])
+        } else {
+          await dataSources.database.articleLike.createArticleLikes(articleId, [user.id])
+        }
+        
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'article star',
+            errors
+          }
+        }
+      } else {
+        if (!user) {
+          errors.push({
+            path: 'articleLike.username',
+            message: 'username is not exist'
+          })
+        }
+        
+        if (!sessionInfo) {
+          errors.push({
+            path: 'articleLike.token',
+            message: 'token is invalid'
+          })
+        }
+
+        response = {
+          sessionInfo: {
+            username,
+            tiken: '',
+            isRefresh: false
+          },
+          isSuccess: false,
+          extension: {
+            operator: 'articleLike',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      errors.push({
+        path: 'articleStar',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "article star",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
 }

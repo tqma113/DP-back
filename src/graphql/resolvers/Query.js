@@ -242,14 +242,20 @@ export default {
         item.content = JSON.parse(await readJSONAsync(item.content))
         item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
         item.categorys = (await dataSources.database.articleCategory.selectArticleCategorysByArticleId(item.id)).map(item => ({ id: item.category_id}))
-        item.collections = await dataSources.database.articleCollection.selectArticleCollectionsByArticleId(item.id)
+        item.collections = (await dataSources.database.articleCollection.selectArticleCollectionsByArticleId(item.id)).map(async item => {
+          item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
+          return item
+        })
         item.comments = (await dataSources.database.comment.selectCommentsById((await dataSources.database.articleComment.selectArticleCommentsByArticleId(item.id)).map(item => item.comment_id))).map(async item => {
           item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
           item.likes = await dataSources.database.commentLike.selectCommentLikeByCommentId(item.id)
           item.comments = await getComComments(item.id)
           return item
         })
-        item.likes = await dataSources.database.articleLike.selectArticleLikesByArticleId(item.id)
+        item.likes = (await dataSources.database.articleLike.selectArticleLikesByArticleId(item.id)).map(async item => {
+          item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
+          return item
+        })
         item.project_link = (await dataSources.database.projectLink.selectProjectLinkByArticleId(item.id)).map(item => item.link)
         return item
       })
