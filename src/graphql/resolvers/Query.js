@@ -214,6 +214,28 @@ export default {
     let response = {}
     let errors = []
 
+    const getComComments = (id) => new Promise((resolve, reject) => {
+      try {
+        dataSources.database.comComment.selectComCommentByCommentedId(id).then(comComents => {
+          if (comComents.length > 0) {
+            let idArr = comComents.map(i => i.comment_id)
+            dataSources.database.comment.selectCommentsById(idArr).then(comments => {
+              comments.map(async item => {
+                item.comments = getComComments(item.id)
+                item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
+              })
+              resolve(comments)
+            })
+          } else {
+            resolve([])
+          }
+        })
+        
+      } catch (err) {
+        reject(err)
+      }
+    })
+
     try {
       let partArticles = await dataSources.database.article.selectArticlesByIds(idList)
       let articles = partArticles.map(async item => {
@@ -224,6 +246,7 @@ export default {
         item.comments = (await dataSources.database.comment.selectCommentsById((await dataSources.database.articleComment.selectArticleCommentsByArticleId(item.id)).map(item => item.comment_id))).map(async item => {
           item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
           item.likes = await dataSources.database.commentLike.selectCommentLikeByCommentId(item.id)
+          item.comments = await getComComments(item.id)
           return item
         })
         item.likes = await dataSources.database.articleLike.selectArticleLikesByArticleId(item.id)

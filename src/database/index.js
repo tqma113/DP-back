@@ -5,7 +5,7 @@ import articleCategory from './article_category'
 import articleCollection from './article_collection'
 import articleComment from './article_comment'
 import articleLike from './article_like'
-import commComment from './com_comment'
+import comComment from './com_comment'
 import commentLike from './comment_like'
 import comment from './comment'
 import eduBackground from './edu_background'
@@ -26,7 +26,7 @@ export default {
   articleCollection,
   articleComment,
   articleLike,
-  commComment,
+  comComment,
   commentLike,
   comment,
   eduBackground,
