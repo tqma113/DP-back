@@ -43,6 +43,7 @@ export default {
       i.concerned = (await dataSources.database.userConcerned.selectUserConcernedsByUserId(i.id)).map(async item => {
         item.user = (await dataSources.database.user.selectUserById(item.concerned_user_id))[0]
         item.user.categorys = (await dataSources.database.userCategory.selectUserCategorysByUserId(item.concerned_user_id)).map(item => item.category_id)
+        item.user.industrys = (await dataSources.database.userIndustry.selectUserIndustrysByUserId(item.concerned_user_id)).map(item => item.industry_id)
         return item
       })
       i.likes = (await dataSources.database.articleLike.selectArticleLikesByUserId(i.id)).map(async item => {
@@ -164,6 +165,7 @@ export default {
       i.concerned = (await dataSources.database.userConcerned.selectUserConcernedsByUserId(i.id)).map(async item => {
         item.user = (await dataSources.database.user.selectUserById(item.concerned_user_id))[0]
         item.user.categorys = (await dataSources.database.userCategory.selectUserCategorysByUserId(item.concerned_user_id)).map(item => item.category_id)
+        item.user.industrys = (await dataSources.database.userIndustry.selectUserIndustrysByUserId(item.concerned_user_id)).map(item => item.industry_id)
         return item
       })
       i.likes = (await dataSources.database.articleLike.selectArticleLikesByUserId(i.id)).map(async item => {
@@ -341,8 +343,6 @@ export default {
         }
       }
     }
-
-    console.log(response)
 
     return response
   }
