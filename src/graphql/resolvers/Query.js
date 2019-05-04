@@ -19,13 +19,24 @@ export default {
     let response = {}
     let errors = []
     const queryAsync = async (i) => {
-      i.industrys = (await dataSources.database.userIndustry.selectUserIndustrysByUserId(i.id)).map(item => item.industry_id)
+      i.industrys =  (await dataSources.database.userIndustry.selectUserIndustrysByUserId(i.id)).map(item => item.industry_id)
       i.eduBG = await dataSources.database.eduBG.selectEduBGsByUserId(i.id)
       i.emRecords = await dataSources.database.emRecord.selectEmRecordsByUserId(i.id)
       i.articles = (await dataSources.database.article.selectArticlesByUserIds([i.id])).map(async item => {
         item.likes = await dataSources.database.articleLike.selectArticleLikesByArticleId(item.id)
         item.collections = await dataSources.database.articleCollection.selectArticleCollectionsByArticleId(item.id)
-        item.comment = await dataSources.database.articleComment.selectArticleCommentsByArticleId(item.id)
+        item.categorys = (await dataSources.database.articleCategory.selectArticleCategorysByArticleId(item.id)).map(item => item.category_id)
+        item.collections = (await dataSources.database.articleCollection.selectArticleCollectionsByArticleId(item.id)).map(async item => {
+          item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
+          return item
+        })
+        let articleCommentIds = (await dataSources.database.articleComment.selectArticleCommentsByArticleId(item.id)).map(i => i.comment_id)
+        if (articleCommentIds.length > 0) {
+          item.comments = await dataSources.database.comment.selectCommentsById(articleCommentIds)
+        } else {
+          item.comments = []
+        }
+        item.project_link = (await dataSources.database.projectLink.selectProjectLinkByArticleId(item.id)).map(item => item.link)
         return item
       })
       i.categorys = (await dataSources.database.userCategory.selectUserCategorysByUserId(i.id)).map(item => item.category_id)
@@ -140,7 +151,12 @@ export default {
           item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
           return item
         })
-        item.comments = await dataSources.database.comment.selectCommentsById((await dataSources.database.articleComment.selectArticleCommentsByArticleId(item.id)).map(item => item.comment_id))
+        let articleCommentIds = (await dataSources.database.articleComment.selectArticleCommentsByArticleId(item.id)).map(i => i.comment_id)
+        if (articleCommentIds.length > 0) {
+          item.comments = await dataSources.database.comment.selectCommentsById(articleCommentIds)
+        } else {
+          item.comments = []
+        }
         item.project_link = (await dataSources.database.projectLink.selectProjectLinkByArticleId(item.id)).map(item => item.link)
         return item
       })
