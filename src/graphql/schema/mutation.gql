@@ -64,4 +64,6 @@ type Mutation {
     categoryIds: [Int]!
     industryIds: [Int]!
   ): Response!
+
+  userConcern(username: String!, token: String!, userId: Int!, status: Boolean!): Response!
 }

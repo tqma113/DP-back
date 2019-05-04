@@ -57,7 +57,7 @@ const selectUserConcernedsByConcernedUserId = (category_id) => new Promise((reso
   });
 });
 
-const deleteUserConcernedsByUserId = (user_id) => new Promise((resolve, reject) => {
+const deleteUserConcernedsByUserId = (user_id, concernedUserId) => new Promise((resolve, reject) => {
   query({
     sql: 'DELETE FROM `user_concerned` WHERE `user_id` = ?',
     values: [user_id]
@@ -77,10 +77,10 @@ const deleteUserConcernedsByUserId = (user_id) => new Promise((resolve, reject) 
   });
 });
 
-const deleteUserConcernedsByConcernedUserId = (user_id) => new Promise((resolve, reject) => {
+const deleteUserConcernedsByConcernedUserId = (user_id, concernedUserIds) => new Promise((resolve, reject) => {
   query({
-    sql: 'DELETE FROM `user_concerned` WHERE `concerned_user_id` = ?',
-    values: [user_id]
+    sql: 'DELETE FROM `user_concerned` WHERE `concerned_user_id` = ? AND `concerned_user_id` = ?',
+    values: [user_id, concernedUserIds]
   })
   .then((res) => {
     if(res) {

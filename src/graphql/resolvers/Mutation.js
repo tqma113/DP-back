@@ -1137,5 +1137,72 @@ export default {
     }
 
     return response
+  },
+  userConcern: async (root, { username, token, userId, status }, { dataSources }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let user = (await dataSources.database.user.selectUser({ username }, ['id']))[0]
+      let sessionInfo = await dataSources.jwt.verify(username, token)
+      let isValid = !!sessionInfo && user
+
+      if (isValid) {
+        if (status) {
+          await dataSources.database.userConcern.deleteUserConcernedsByConcernedUserId(user.id, Number(userId))
+        } else {
+          await dataSources.database.userConcern.createUserConcerneds(user.id, [Number(userId)])
+        }
+        
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'user concern',
+            errors
+          }
+        }
+      } else {
+        if (!user) {
+          errors.push({
+            path: 'userConcern.username',
+            message: 'username is not exist'
+          })
+        }
+        
+        if (!sessionInfo) {
+          errors.push({
+            path: 'userConcern.token',
+            message: 'token is invalid'
+          })
+        }
+
+        response = {
+          sessionInfo: {
+            username,
+            tiken: '',
+            isRefresh: false
+          },
+          isSuccess: false,
+          extension: {
+            operator: 'userConcern',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      errors.push({
+        path: 'userConcern',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "user concern",
+          errors
+        }
+      }
+    }
+
+    return response
   }
 }
