@@ -1,11 +1,11 @@
 type Query {
   checkLoginState(username: ID!, token: String!): Response!
 
-  users(usernames: [String!]!): Response!
+  users(usernames: [String], categoryIds: [Int], industryIds: [Int]): Response!
 
   categorys: Response!
 
   industrys: Response!
 
-  articles(idList: [Int!]!): Response!
+  articles(idList: [Int], categoryIds: [Int]): Response!
 }

@@ -46,6 +46,12 @@ export default {
         item.user.industrys = (await dataSources.database.userIndustry.selectUserIndustrysByUserId(item.concerned_user_id)).map(item => item.industry_id)
         return item
       })
+      i.concern = (await dataSources.database.userConcerned.selectUserConcernedsByConcernedUserId(i.id)).map(async item => {
+        item.user = (await dataSources.database.user.selectUserById(item.concerned_user_id))[0]
+        item.user.categorys = (await dataSources.database.userCategory.selectUserCategorysByUserId(item.concerned_user_id)).map(item => item.category_id)
+        item.user.industrys = (await dataSources.database.userIndustry.selectUserIndustrysByUserId(item.concerned_user_id)).map(item => item.industry_id)
+        return item
+      })
       i.likes = (await dataSources.database.articleLike.selectArticleLikesByUserId(i.id)).map(async item => {
         item.article = (await dataSources.database.article.selectArticlesByIds([item.article_id]))[0]
         return item
@@ -136,7 +142,7 @@ export default {
     
     return response
   },
-  users: async (root, { usernames }, { dataSources }, info) => {
+  users: async (root, { usernames, categoryIds, industryIds }, { dataSources }, info) => {
     let response = {}
     let errors = []
     
@@ -168,6 +174,12 @@ export default {
         item.user.industrys = (await dataSources.database.userIndustry.selectUserIndustrysByUserId(item.concerned_user_id)).map(item => item.industry_id)
         return item
       })
+      i.concern = (await dataSources.database.userConcerned.selectUserConcernedsByConcernedUserId(i.id)).map(async item => {
+        item.user = (await dataSources.database.user.selectUserById(item.concerned_user_id))[0]
+        item.user.categorys = (await dataSources.database.userCategory.selectUserCategorysByUserId(item.concerned_user_id)).map(item => item.category_id)
+        item.user.industrys = (await dataSources.database.userIndustry.selectUserIndustrysByUserId(item.concerned_user_id)).map(item => item.industry_id)
+        return item
+      })
       i.likes = (await dataSources.database.articleLike.selectArticleLikesByUserId(i.id)).map(async item => {
         item.article = (await dataSources.database.article.selectArticlesByIds([item.article_id]))[0]
         return item
@@ -180,8 +192,32 @@ export default {
       return i
     }
     try {
-      let promises = usernames.map(username => dataSources.database.user.selectUser({ username }))
-      let users = await Promise.all((await Promise.all(promises)).map(i => queryAsync(i[0])))
+      let users = []
+      if ((categoryIds && categoryIds.length && categoryIds.length > 0) || (industryIds && industryIds.length && industryIds.length > 0)) {
+        let userIds = []
+        if (categoryIds && categoryIds.length && categoryIds.length > 0) {
+          userIds = (await dataSources.database.userCategory.selectUserCategorysByCategoryIds(categoryIds)).map(item => item.user_id)
+          if (industryIds && industryIds.length && industryIds.length > 0) {
+            let userId2 = (await dataSources.database.userIndustry.selectUserIndustrysByIndustryIds(industryIds)).map(item => item.user_id)
+            userIds = userIds.filter(item => userId2.some(i => i == item))
+          }
+        } else {
+          userIds = (await dataSources.database.userIndustry.selectUserIndustrysByIndustryIds(industryIds)).map(item => item.user_id)
+        }
+        users = await dataSources.database.user.selectUsersByIds(userIds)
+        if (usernames && usernames.length && usernames.length > 0) {
+          users = users.filter(item => usernames.some(i => item.username == i))
+        }
+      } else {
+        if (usernames && usernames.length && usernames.length > 0) {
+          users = await dataSources.database.user.selectUsersByUsernames(usernames)
+        } else {
+          users = await dataSources.database.user.selectUsers()
+        }
+      }
+
+      users = users.map(async i => queryAsync(i))
+      
       response = {
         users,
         isSuccess: true,
@@ -215,6 +251,10 @@ export default {
     let errors = []
     try {
       let categorys = await dataSources.database.category.selectCategory()
+      categorys = categorys.map(async item => {
+        item.users = await dataSources.database.userCategory.selectUserCategorysByCategoryId(item.id)
+        return item
+      })
       response = {
         categorys,
         isSuccess: true,
@@ -245,6 +285,10 @@ export default {
     let errors = []
     try {
       let industrys = await dataSources.database.industry.selectIndustry()
+      industrys = industrys.map(async item => {
+        item.users = await dataSources.database.userIndustry.selectUserIndustrysByIndustryId(item.id)
+        return item
+      })
       response = {
         industrys,
         isSuccess: true,
@@ -270,7 +314,7 @@ export default {
     }
     return response
   },
-  articles: async (root, { idList }, { dataSources }, info) => {
+  articles: async (root, { idList, categoryIds }, { dataSources }, info) => {
     let response = {}
     let errors = []
 
@@ -297,7 +341,16 @@ export default {
     })
 
     try {
-      let partArticles = await dataSources.database.article.selectArticlesByIds(idList)
+      let partArticles = []
+      if (idList && idList.length && idList.length > 0) {
+        partArticles = await dataSources.database.article.selectArticlesByIds(idList)
+      } else {
+        partArticles = await dataSources.database.article.selectArticle()
+      }
+      if (categoryIds && categoryIds.length && categoryIds.length > 0) {
+        let articleCategorys = await dataSources.database.articleCategory.selectArticleCategorysByCategoryIds(categoryIds)
+        partArticles.filter(item => articleCategorys.some(i => i.article_id == item.id))
+      }
       let articles = partArticles.map(async item => {
         item.content = JSON.parse(await readJSONAsync(item.content))
         item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
@@ -345,5 +398,5 @@ export default {
     }
 
     return response
-  }
+  },
 }

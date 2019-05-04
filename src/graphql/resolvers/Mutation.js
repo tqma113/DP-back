@@ -690,11 +690,10 @@ export default {
           if (categorys.affectedRows=== categoryIds.length) {
             newArticle.user = user
             newArticle.project_link = []
-            newArticle.category = categoryIds
-            newArticle.industrys = []
+            newArticle.categorys = categoryIds
             newArticle.comments = []
-            newArticle.likes = 0
-            newArticle.collections = 0
+            newArticle.likes = []
+            newArticle.collections = []
     
             response = {
               article: newArticle,
@@ -1199,6 +1198,141 @@ export default {
         isSuccess: false,
         extension: {
           operator: "user concern",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  categoryStar: async (root, { username, token, categoryId, status }, { dataSources }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let user = (await dataSources.database.user.selectUser({ username }, ['id']))[0]
+      let sessionInfo = await dataSources.jwt.verify(username, token)
+      let isValid = !!sessionInfo && user
+
+      if (isValid) {
+        if (status) {
+          await dataSources.database.userCategory.deleteUserCategorys(user.id, categoryId)
+        } else {
+          await dataSources.database.userCategory.createUserCategorys(user.id, [categoryId])
+        }
+        
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'category star',
+            errors
+          }
+        }
+      } else {
+        if (!user) {
+          errors.push({
+            path: 'categoryStar.username',
+            message: 'username is not exist'
+          })
+        }
+        
+        if (!sessionInfo) {
+          errors.push({
+            path: 'categoryStar.token',
+            message: 'token is invalid'
+          })
+        }
+
+        response = {
+          sessionInfo: {
+            username,
+            tiken: '',
+            isRefresh: false
+          },
+          isSuccess: false,
+          extension: {
+            operator: 'categoryStar',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      errors.push({
+        path: 'categoryStar',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "category star",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  industryStar: async (root, { username, token, industryId, status }, { dataSources }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let user = (await dataSources.database.user.selectUser({ username }, ['id']))[0]
+      let sessionInfo = await dataSources.jwt.verify(username, token)
+      let isValid = !!sessionInfo && user
+
+      if (isValid) {
+        if (status) {
+          await dataSources.database.userIndustry.deleteUserIndustry(user.id, industryId)
+        } else {
+          await dataSources.database.userIndustry.createUserIndustrys(user.id, [industryId])
+        }
+        
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'industry star',
+            errors
+          }
+        }
+      } else {
+        if (!user) {
+          errors.push({
+            path: 'industryStar.username',
+            message: 'username is not exist'
+          })
+        }
+        
+        if (!sessionInfo) {
+          errors.push({
+            path: 'industryStar.token',
+            message: 'token is invalid'
+          })
+        }
+
+        response = {
+          sessionInfo: {
+            username,
+            tiken: '',
+            isRefresh: false
+          },
+          isSuccess: false,
+          extension: {
+            operator: 'industryStar',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'industryStar',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "industry star",
           errors
         }
       }

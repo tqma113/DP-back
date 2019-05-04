@@ -37,10 +37,10 @@ const selectUserConcernedsByUserId = (user_id) => new Promise((resolve, reject) 
   });
 });
 
-const selectUserConcernedsByConcernedUserId = (category_id) => new Promise((resolve, reject) => {
+const selectUserConcernedsByConcernedUserId = (user_id) => new Promise((resolve, reject) => {
   query({
     sql: 'SELECT * FROM `user_concerned` WHERE `concerned_user_id` = ?',
-    values: [category_id]
+    values: [user_id]
   })
   .then((res) => {
     if(res) {

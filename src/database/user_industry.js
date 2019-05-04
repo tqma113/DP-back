@@ -37,6 +37,28 @@ const selectUserIndustrysByUserId = (user_id) => new Promise((resolve, reject) =
   });
 });
 
+const selectUserIndustrysByUserIds = (idList) => new Promise((resolve, reject) => {
+  let sql = 'SELECT * FROM `user_industry` WHERE `user_id` IN '
+  sql += '(' + idList.join(', ') + ')'
+  query({
+    sql,
+    values: []
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
 const selectUserIndustrysByIndustryId = (industry_id) => new Promise((resolve, reject) => {
   query({
     sql: 'SELECT * FROM `user_industry` WHERE `industry_id` = ?',
@@ -57,10 +79,32 @@ const selectUserIndustrysByIndustryId = (industry_id) => new Promise((resolve, r
   });
 });
 
-const deleteUserIndustrysByUserId = (user_id) => new Promise((resolve, reject) => {
+const selectUserIndustrysByIndustryIds = (idList) => new Promise((resolve, reject) => {
+  let sql = 'SELECT * FROM `user_industry` WHERE `industry_id` IN '
+  sql += '(' + idList.join(', ') + ')'
   query({
-    sql: 'DELETE FROM `user_industry` WHERE `user_id` = ?',
-    values: [user_id]
+    sql,
+    values: []
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
+const deleteUserIndustry= (user_id, industry_id) => new Promise((resolve, reject) => {
+  query({
+    sql: 'DELETE FROM `user_industry` WHERE `user_id` = ? AND `industry_id` = ?',
+    values: [user_id, industry_id]
   })
   .then((res) => {
     if(res) {
@@ -81,5 +125,7 @@ export default {
   createUserIndustrys,
   selectUserIndustrysByUserId,
   selectUserIndustrysByIndustryId,
-  deleteUserIndustrysByUserId
+  deleteUserIndustry,
+  selectUserIndustrysByUserIds,
+  selectUserIndustrysByIndustryIds
 }

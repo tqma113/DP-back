@@ -66,4 +66,8 @@ type Mutation {
   ): Response!
 
   userConcern(username: String!, token: String!, userId: Int!, status: Boolean!): Response!
+
+  categoryStar(username: String!, token: String!, categoryId: Int!, status: Boolean!): Response!
+
+  industryStar(username: String!, token: String!, industryId: Int!, status: Boolean!): Response!
 }

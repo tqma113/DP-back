@@ -15,8 +15,8 @@ type User {
   articles: [Article]!
   emRecords: [EmRecord]!
   categorys: [Int]!
-  concerned_categorys: [Category]!
   concerned: [Concern]!
+  concern: [Concern]
   likes: [Like]!
   collections: [Collect]!
   dynamics: [Dynamics]!
@@ -49,12 +49,15 @@ type Industry {
   name: String
   description: String
   image: String
+  users: [JSON]
 }
 
 type Category {
   id: ID!
   subject: String
   description: String
+  users: [JSON]
+  image: String
 }
 
 type Like {

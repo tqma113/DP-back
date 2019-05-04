@@ -37,6 +37,28 @@ const selectUserCategorysByUserId = (user_id) => new Promise((resolve, reject) =
   });
 });
 
+const selectUserCategorysByUserIds = (idList) => new Promise((resolve, reject) => {
+  let sql = 'SELECT * FROM `user_category` VALUES `user_id` IN '
+  sql += '(' + idList.join(', ') + ')'
+  query({
+    sql,
+    values: []
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
 const selectUserCategorysByCategoryId = (category_id) => new Promise((resolve, reject) => {
   query({
     sql: 'SELECT * FROM `user_category` WHERE `category_id` = ?',
@@ -57,10 +79,32 @@ const selectUserCategorysByCategoryId = (category_id) => new Promise((resolve, r
   });
 });
 
-const deleteUserCategorysByUserId = (user_id) => new Promise((resolve, reject) => {
+const selectUserCategorysByCategoryIds = (idList) => new Promise((resolve, reject) => {
+  let sql = 'SELECT * FROM `user_category` WHERE `category_id` IN'
+  sql += '(' + idList.join(', ') + ')'
   query({
-    sql: 'DELETE FROM `user_category` WHERE `user_id` = ?',
-    values: [user_id]
+    sql,
+    values: []
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
+const deleteUserCategorys = (user_id, categoryId) => new Promise((resolve, reject) => {
+  query({
+    sql: 'DELETE FROM `user_category` WHERE `user_id` = ? AND `category_id` = ?',
+    values: [user_id, categoryId]
   })
   .then((res) => {
     if(res) {
@@ -81,5 +125,7 @@ export default {
   createUserCategorys,
   selectUserCategorysByUserId,
   selectUserCategorysByCategoryId,
-  deleteUserCategorysByUserId
+  deleteUserCategorys,
+  selectUserCategorysByUserIds,
+  selectUserCategorysByCategoryIds
 }

@@ -57,8 +57,32 @@ const selectArticleCategorysByCategoryId = (category_id) => new Promise((resolve
   });
 });
 
+
+const selectArticleCategorysByCategoryIds = (idList) => new Promise((resolve, reject) => {
+  let sql = 'SELECT * FROM `article_category` WHERE `category_id` IN'
+  sql += '(' + idList.join(', ') + ')'
+  query({
+    sql,
+    values: []
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
 export default {
   createArticleCategorys,
   selectArticleCategorysByArticleId,
-  selectArticleCategorysByCategoryId
+  selectArticleCategorysByCategoryId,
+  selectArticleCategorysByCategoryIds
 }
