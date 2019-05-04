@@ -8,7 +8,7 @@ import articleLike from './article_like'
 import comComment from './com_comment'
 import commentLike from './comment_like'
 import comment from './comment'
-import eduBackground from './edu_background'
+import eduBG from './edu_background'
 import emRecord from './em_record'
 import industry from './industry'
 import message from './message'
@@ -16,7 +16,7 @@ import projectLink from './project_link'
 import secQuestion from './sec_question'
 import userCategory from './user_category'
 import userIndustry from './user_industry'
-import userCollection from './user_concerned'
+import userConcerned from './user_concerned'
 
 export default {
   user,
@@ -29,7 +29,7 @@ export default {
   comComment,
   commentLike,
   comment,
-  eduBackground,
+  eduBG,
   emRecord,
   industry,
   message,
@@ -37,5 +37,5 @@ export default {
   secQuestion,
   userCategory,
   userIndustry,
-  userCollection
+  userConcerned
 }

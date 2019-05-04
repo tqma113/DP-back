@@ -290,6 +290,8 @@ export default {
             errors
           }
         }
+
+        await dataSources.Email.AckKey.delete(email)
       } else {
         if (!user) {
           errors.push({
@@ -907,7 +909,7 @@ export default {
 
     return response
   },
-  articleStar: async (root, { username, token, articleId, status }, { dataSources }, Info) => {
+  articleStar: async (root, { username, token, articleId, status }, { dataSources }, info) => {
     let response = {}
     let errors = []
 
@@ -975,7 +977,7 @@ export default {
 
     return response
   },
-  articleLike: async (root, { username, token, articleId, status = false }, { dataSources }, Info) => {
+  articleLike: async (root, { username, token, articleId, status = false }, { dataSources }, info) => {
     let response = {}
     let errors = []
 
@@ -1042,4 +1044,98 @@ export default {
 
     return response
   },
+  changeUserInfo: async (root, { email, key, nickname, location, gender, birthday, avatar, statement, eduBG, emRecords, categoryIds, industryIds, secQuestions }, { dataSources }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let user = (await dataSources.database.user.selectUser({ email }, ['id']))[0]
+      let isValidEKey = await dataSources.Email.AckKey.check(email, key);
+      let isValid = user && isValidEKey
+
+      if (isValid) {
+        if (nickname) {
+          await dataSources.database.user.updateUserById(user.id, 'nickname', nickname)
+        }
+        if (location) {
+          await dataSources.database.user.updateUserById(user.id, 'location', location)
+        }
+        if (birthday) {
+          await dataSources.database.user.updateUserById(user.id, 'birthday', birthday)
+        }
+        if (gender) {
+          await dataSources.database.user.updateUserById(user.id, 'gender', gender)
+        }
+        if (avatar) {
+          await dataSources.database.user.updateUserById(user.id, 'avatar', avatar)
+        }
+        if (statement) {
+          await dataSources.database.user.updateUserById(user.id, 'statement', statement)
+        }
+        if (eduBG && eduBG.length > 0) {
+          await dataSources.database.eduBG.deleteEduBGsByUserId(user.id)
+          await dataSources.database.eduBG.createEduBGs(user.id, secQuestions)
+        }
+        if (emRecords && emRecords.length > 0) {
+          await dataSources.database.emRecord.deleteEmRecordsByUserId(user.id)
+          await dataSources.database.emRecord.createEmRecords(user.id, secQuestions)
+        }
+        if (secQuestions && secQuestions.length > 0) {
+          await dataSources.database.secQuestion.deleteUserSecQuestionByUserId(user.id)
+          await dataSources.database.secQuestion.createSecQuestions(user.id, secQuestions)
+        }
+        if (categoryIds.length > 0) {
+          await dataSources.database.userCategory.deleteUserCategorysByUserId(user.id)
+          await dataSources.database.userCategory.createUserCategorys(user.id, categoryIds)
+        }
+        if (industryIds.length > 0) {
+          await dataSources.database.userIndustry.deleteUserIndustrysByUserId(user.id)
+          await dataSources.database.userIndustry.createUserIndustrys(user.id, industryIds)
+        }
+
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'changeUserInfo',
+            errors
+          }
+        }
+      } else {
+        if (!user) {
+          errors.push({
+            path: 'changeUserInfo',
+            message: 'email is invalid'
+          })
+        }
+        if (!isValidEKey) {
+          errors.push({
+            path: 'changeUserInfo',
+            message: 'ack key is invalid'
+          })
+        }
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'changeUserInfo',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'changeUserInfo',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "change user info",
+          errors
+        }
+      }
+    }
+
+    return response
+  }
 }

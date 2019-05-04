@@ -12,7 +12,8 @@ export default async (sql) => new Promise((resolve, reject) => {
 
       if (err) {
         console.error('error connection:' + err.stack)
-        return
+        console.log(sql)
+        reject(err)
       }
       else {
         resolve(results)

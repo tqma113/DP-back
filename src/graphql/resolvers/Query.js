@@ -18,6 +18,33 @@ export default {
   checkLoginState: async (root, { username, token }, { dataSources }, info) => {
     let response = {}
     let errors = []
+    const queryAsync = async (i) => {
+      i.industrys = (await dataSources.database.userIndustry.selectUserIndustrysByUserId(i.id)).map(item => item.industry_id)
+      i.eduBG = await dataSources.database.eduBG.selectEduBGsByUserId(i.id)
+      i.emRecords = await dataSources.database.emRecord.selectEmRecordsByUserId(i.id)
+      i.articles = (await dataSources.database.article.selectArticlesByUserIds([i.id])).map(async item => {
+        item.likes = await dataSources.database.articleLike.selectArticleLikesByArticleId(item.id)
+        item.collections = await dataSources.database.articleCollection.selectArticleCollectionsByArticleId(item.id)
+        item.comment = await dataSources.database.articleComment.selectArticleCommentsByArticleId(item.id)
+        return item
+      })
+      i.categorys = (await dataSources.database.userCategory.selectUserCategorysByUserId(i.id)).map(item => item.category_id)
+      i.concerned = (await dataSources.database.userConcerned.selectUserConcernedsByUserId(i.id)).map(async item => {
+        item.user = (await dataSources.database.user.selectUserById(item.concerned_user_id))[0]
+        item.user.categorys = (await dataSources.database.userCategory.selectUserCategorysByUserId(item.concerned_user_id)).map(item => item.category_id)
+        return item
+      })
+      i.likes = (await dataSources.database.articleLike.selectArticleLikesByUserId(i.id)).map(async item => {
+        item.article = (await dataSources.database.article.selectArticlesByIds([item.article_id]))[0]
+        return item
+      })
+      i.collections = (await dataSources.database.articleCollection.selectArticleCollectionsByUserId(i.id)).map(async item => {
+        item.article = (await dataSources.database.article.selectArticlesByIds([item.article_id]))[0]
+        return item
+      })
+      i.dynamics = []
+      return i
+    }
     try {
       let user = {}
 
@@ -31,18 +58,9 @@ export default {
       let isValid = !!sessionInfo && user
 
       if (isValid) {
-        user = (await dataSources.database.user.selectUser({ username }, []))[0]
-        user.industry = []
-        user.eduBG = []
-        user.emRecords = []
-        user.articles = await dataSources.database.article.selectArticlesByUserIds([user.id])
-        user.categorys = []
-        user.concerned_categorys = []
-        user.concerned = []
-        user.likes = []
-        user.collections = []
-        user.dynamics = []
-  
+        user = (await dataSources.database.user.selectUser({ username }, []))[0]        
+        user = await queryAsync(user)
+
         response = {
           sessionInfo: {
             username,
@@ -85,8 +103,9 @@ export default {
         }
       }
     } catch (err) {
+      console.log(err)
       errors.push({
-        path: 'register',
+        path: 'checkLoginState',
         message: JSON.stringify(err)
       })
       response = {
@@ -108,16 +127,37 @@ export default {
   users: async (root, { usernames }, { dataSources }, info) => {
     let response = {}
     let errors = []
+    
     const queryAsync = async (i) => {
-      i.industry = []
-      i.eduBG = []
-      i.emRecords = []
-      i.articles = await dataSources.database.article.selectArticlesByUserIds([i.id])
-      i.categorys = []
-      i.concerned_categorys = []
-      i.concerned = []
-      i.likes = []
-      i.collections = []
+      i.industrys =  (await dataSources.database.userIndustry.selectUserIndustrysByUserId(i.id)).map(item => item.industry_id)
+      i.eduBG = await dataSources.database.eduBG.selectEduBGsByUserId(i.id)
+      i.emRecords = await dataSources.database.emRecord.selectEmRecordsByUserId(i.id)
+      i.articles = (await dataSources.database.article.selectArticlesByUserIds([i.id])).map(async item => {
+        item.likes = await dataSources.database.articleLike.selectArticleLikesByArticleId(item.id)
+        item.collections = await dataSources.database.articleCollection.selectArticleCollectionsByArticleId(item.id)
+        item.categorys = (await dataSources.database.articleCategory.selectArticleCategorysByArticleId(item.id)).map(item => item.category_id)
+        item.collections = (await dataSources.database.articleCollection.selectArticleCollectionsByArticleId(item.id)).map(async item => {
+          item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
+          return item
+        })
+        item.comments = await dataSources.database.comment.selectCommentsById((await dataSources.database.articleComment.selectArticleCommentsByArticleId(item.id)).map(item => item.comment_id))
+        item.project_link = (await dataSources.database.projectLink.selectProjectLinkByArticleId(item.id)).map(item => item.link)
+        return item
+      })
+      i.categorys = (await dataSources.database.userCategory.selectUserCategorysByUserId(i.id)).map(item => item.category_id)
+      i.concerned = (await dataSources.database.userConcerned.selectUserConcernedsByUserId(i.id)).map(async item => {
+        item.user = (await dataSources.database.user.selectUserById(item.concerned_user_id))[0]
+        item.user.categorys = (await dataSources.database.userCategory.selectUserCategorysByUserId(item.concerned_user_id)).map(item => item.category_id)
+        return item
+      })
+      i.likes = (await dataSources.database.articleLike.selectArticleLikesByUserId(i.id)).map(async item => {
+        item.article = (await dataSources.database.article.selectArticlesByIds([item.article_id]))[0]
+        return item
+      })
+      i.collections = (await dataSources.database.articleCollection.selectArticleCollectionsByUserId(i.id)).map(async item => {
+        item.article = (await dataSources.database.article.selectArticlesByIds([item.article_id]))[0]
+        return item
+      })
       i.dynamics = []
       return i
     }
@@ -133,6 +173,7 @@ export default {
         }
       }
     } catch (err) {
+      console.log(err)
       errors.push({
         path: 'users',
         message: JSON.stringify(err)
@@ -148,6 +189,7 @@ export default {
       }
     }
 
+    // console.log(response)
     return response
   },
   categorys: async (root, { }, { dataSources }, info) => {
@@ -241,14 +283,14 @@ export default {
       let articles = partArticles.map(async item => {
         item.content = JSON.parse(await readJSONAsync(item.content))
         item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
-        item.categorys = (await dataSources.database.articleCategory.selectArticleCategorysByArticleId(item.id)).map(item => ({ id: item.category_id}))
+        item.categorys = (await dataSources.database.articleCategory.selectArticleCategorysByArticleId(item.id)).map(item => item.category_id)
         item.collections = (await dataSources.database.articleCollection.selectArticleCollectionsByArticleId(item.id)).map(async item => {
           item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
           return item
         })
         item.comments = (await dataSources.database.comment.selectCommentsById((await dataSources.database.articleComment.selectArticleCommentsByArticleId(item.id)).map(item => item.comment_id))).map(async item => {
           item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
-          item.likes = await dataSources.database.commentLike.selectCommentLikeByCommentId(item.id)
+          item.likes = (await dataSources.database.commentLike.selectCommentLikeByCommentId(item.id))
           item.comments = await getComComments(item.id)
           return item
         })
@@ -268,6 +310,7 @@ export default {
         }
       }
     } catch (err) {
+      conosle.log(err)
       errors.push({
         path: 'users',
         message: JSON.stringify(err)
@@ -282,6 +325,8 @@ export default {
         }
       }
     }
+
+    console.log(response)
 
     return response
   }

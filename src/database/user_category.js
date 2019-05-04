@@ -1,9 +1,9 @@
 import query from './mysql/index';
 
-const createArticleCategorys = (articleId, categoryIds) => new Promise((resolve, reject) => {
-  let sql = 'INSERT INTO `article_category` (`article_id`, `category_id`) VALUES '
+const createUserCategorys = (userId, categoryIds) => new Promise((resolve, reject) => {
+  let sql = 'INSERT INTO `user_category` (`user_id`, `category_id`) VALUES '
   sql += categoryIds.map(item => {
-    return '(' + articleId + ', ' + item + ')'
+    return '(' + userId + ', ' + item + ')'
   }).join(', ') + ';'
   query({
     sql,
@@ -17,13 +17,52 @@ const createArticleCategorys = (articleId, categoryIds) => new Promise((resolve,
   });
 })
 
-const selectArticleCategorysByUserId = (article_id) => new Promise((resolve, reject) => {
+const selectUserCategorysByUserId = (user_id) => new Promise((resolve, reject) => {
   query({
-    sql: 'SELECT * FROM `article_category` WHERE `article_id` = ?',
-    values: [article_id]
+    sql: 'SELECT * FROM `user_category` WHERE `user_id` = ?',
+    values: [user_id]
   })
   .then((res) => {
-    console.log(article_id,res)
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
+const selectUserCategorysByCategoryId = (category_id) => new Promise((resolve, reject) => {
+  query({
+    sql: 'SELECT * FROM `user_category` WHERE `category_id` = ?',
+    values: [category_id]
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
+const deleteUserCategorysByUserId = (user_id) => new Promise((resolve, reject) => {
+  query({
+    sql: 'DELETE FROM `user_category` WHERE `user_id` = ?',
+    values: [user_id]
+  })
+  .then((res) => {
     if(res) {
       resolve(res)
     } else {
@@ -39,6 +78,8 @@ const selectArticleCategorysByUserId = (article_id) => new Promise((resolve, rej
 });
 
 export default {
-  createArticleCategorys,
-  selectArticleCategorysByUserId
+  createUserCategorys,
+  selectUserCategorysByUserId,
+  selectUserCategorysByCategoryId,
+  deleteUserCategorysByUserId
 }

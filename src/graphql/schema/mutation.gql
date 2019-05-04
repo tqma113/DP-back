@@ -41,11 +41,27 @@ type Mutation {
     categoryIds: [Int]!
   ): Response!
 
-  checkArticleIdValid(id: Int!): Response
+  checkArticleIdValid(id: Int!): Response!
 
-  sendComment(username: String!, token: String!, content: String!, articleId: Int!): Response
+  sendComment(username: String!, token: String!, content: String!, articleId: Int!): Response!
 
-  articleStar(username: String!, token: String!, articleId: Int!, status: Boolean!): Response
+  articleStar(username: String!, token: String!, articleId: Int!, status: Boolean!): Response!
 
-  articleLike(username: String!, token: String!, articleId: Int!, status: Boolean!): Response
+  articleLike(username: String!, token: String!, articleId: Int!, status: Boolean!): Response!
+
+  changeUserInfo(
+    email: String!,
+    key: String!,
+    nickname: String
+    location: String
+    gender: String
+    birthday: Date
+    avatar: String
+    statement: String
+    eduBG: JSON
+    emRecords: JSON
+    secQuestions: JSON
+    categoryIds: [Int]!
+    industryIds: [Int]!
+  ): Response!
 }

@@ -37,7 +37,28 @@ const selectArticleCategorysByArticleId = (article_id) => new Promise((resolve, 
   });
 });
 
+const selectArticleCategorysByCategoryId = (category_id) => new Promise((resolve, reject) => {
+  query({
+    sql: 'SELECT * FROM `article_category` WHERE `category_id` = ?',
+    values: [category_id]
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
 export default {
   createArticleCategorys,
-  selectArticleCategorysByArticleId
+  selectArticleCategorysByArticleId,
+  selectArticleCategorysByCategoryId
 }

@@ -5,7 +5,7 @@ type User {
   location: String
   gender: String!
   birthday: Date
-  industry: [Industry]!
+  industrys: [Int]!
   register_at: Date!
   last_login_at: Date!
   avatar: String
@@ -14,12 +14,13 @@ type User {
   eduBG: [EduBG]!
   articles: [Article]!
   emRecords: [EmRecord]!
-  categorys: [Category]!
+  categorys: [Int]!
   concerned_categorys: [Category]!
   concerned: [Concern]!
   likes: [Like]!
   collections: [Collect]!
   dynamics: [Dynamics]!
+  secQuestion: [SecQuestion]!
 }
 
 type EduBG {
@@ -79,10 +80,9 @@ type Collect {
 type Concern {
   id: ID!
   user_id: Int
-  concern_user_id: Int
+  concerned_user_id: Int
   user: User
   concern_user: User
-  create_time: Date
 }
 
 type Article {
@@ -94,7 +94,7 @@ type Article {
   last_modify_time: Date
   user: User
   project_link: [String]
-  categorys: [Category]
+  categorys: [Int]!
   comments: [Comment]
   likes: [Like]
   collections: [Collect]
@@ -103,6 +103,8 @@ type Article {
 type Comment {
   id: ID!
   content: String
+  user_id: String
+  article_id: String
   user: User
   article: Article
   comments: [JSON]
