@@ -1149,9 +1149,9 @@ export default {
 
       if (isValid) {
         if (status) {
-          await dataSources.database.userConcern.deleteUserConcernedsByConcernedUserId(user.id, Number(userId))
+          await dataSources.database.userConcerned.deleteUserConcerned(user.id, userId)
         } else {
-          await dataSources.database.userConcern.createUserConcerneds(user.id, [Number(userId)])
+          await dataSources.database.userConcerned.createUserConcerneds(user.id, [userId])
         }
         
         response = {
@@ -1190,6 +1190,7 @@ export default {
         }
       }
     } catch (err) {
+      console.log(err)
       errors.push({
         path: 'userConcern',
         message: JSON.stringify(err)
