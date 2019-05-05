@@ -46,26 +46,46 @@ const apollo = new ApolloServer({
   subscriptions: {
     path: '/subscriptions',
     // keepAlive: 20,
-    onConnect: (connectionParams, webSocket) => {
-      // TODO GraphQL鉴权还是逻辑中健全?
-      console.log('Subscription Connected!')
-
+    onConnect: (connectionParams, webSocket, context) => new Promise((resolve, reject) => {
       // GraphQL鉴权
-      // if (connectionParams.authToken) {
-      //   return validateToken(connectionParams.authToken)
-      //     .then(findUser(connectionParams.authToken))
-      //     .then(user => {
-      //       return {
-      //         currentUser: user,
-      //       };
-      //     });
-      // }
+      try {
+        if (connectionParams.authToken && connectionParams.username) {
+          jwt.verify(connectionParams.username, connectionParams.authToken)
+            .then(info => {
+              if (info) {
+                return database.user.selectUsersByUsernames([connectionParams.username])
+                .then(users => {
+                  database.user.updateUserById(users[0].id, 'status', 1)
+                  resolve({
+                    connectionParams,
+                    webSocket,
+                    context,
+                    user: users[0],
+                    sessionInfo: info
+                  })
+                })
+              } else {
+                reject(false)
+              }
+            });
+        }
 
-      // throw new Error('Missing auth token!');
-    },
-    onDisconnect: (webSocket, initPromise) => {
-      // TODO
-      
+      } catch(err) {
+        reject(err)
+      }
+    }),
+    onDisconnect: async (webSocket, context) => {
+      // 
+      try {
+        let info = await context.initPromise
+        if (info.user) {
+          database.user.updateUserById(info.user.id, 'status', 0)
+        } else {
+          console.log('somethings wrong')
+        }
+      } catch (err) {
+        console.log(err)
+      }
     }
   },
   tracing: true,
@@ -93,17 +113,18 @@ const apollo = new ApolloServer({
     let user = {}
     let errors = []
     let token = req.headers.authorization || ''
+    let username = req.headers.username || ''
     try {
-      let info = jwt.verify(token)
-      let username = info.username
-      let currentUser = await user.selectUser({username}, ['id', 'username', 'email'])
-      user = currentUser
-
+      let info = jwt.verify(username, token)
+      if (info) {
+        let currentUser = await user.selectUser({username}, [])
+        user = currentUser
+      }
     } catch (err) {
       errors = [err]
     }
 
-    return { res, req, errors, user}
+    return { res, req, errors, currentUser: user, sessionInfo: info }
   },
   dataSources: () => {
     return {

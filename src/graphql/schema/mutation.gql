@@ -3,7 +3,7 @@ type Mutation {
 
   loginWithEmail(email: String!, code: String!, key: String!): Response!
 
-  logout(username: String!): Response!
+  logout: Response!
 
   register(
     username: String!, 
@@ -36,18 +36,16 @@ type Mutation {
     title: String!,
     abstract: String!,
     content: String!,
-    username: String!,
-    token: String!,
     categoryIds: [Int]!
   ): Response!
 
   checkArticleIdValid(id: Int!): Response!
 
-  sendComment(username: String!, token: String!, content: String!, articleId: Int!): Response!
+  sendComment(content: String!, articleId: Int!): Response!
 
-  articleStar(username: String!, token: String!, articleId: Int!, status: Boolean!): Response!
+  articleStar(articleId: Int!, status: Boolean!): Response!
 
-  articleLike(username: String!, token: String!, articleId: Int!, status: Boolean!): Response!
+  articleLike(articleId: Int!, status: Boolean!): Response!
 
   changeUserInfo(
     email: String!,
@@ -65,9 +63,11 @@ type Mutation {
     industryIds: [Int]!
   ): Response!
 
-  userConcern(username: String!, token: String!, userId: Int!, status: Boolean!): Response!
+  userConcern(userId: Int!, status: Boolean!): Response!
 
-  categoryStar(username: String!, token: String!, categoryId: Int!, status: Boolean!): Response!
+  categoryStar(categoryId: Int!, status: Boolean!): Response!
 
-  industryStar(username: String!, token: String!, industryId: Int!, status: Boolean!): Response!
+  industryStar(industryId: Int!, status: Boolean!): Response!
+
+  sendMessage(userId: Int!, message: String!): Response!
 }

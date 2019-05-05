@@ -1,14 +1,22 @@
-const { PubSub, withFilter } = require('apollo-server');
+import { PubSub, withFilter } from 'apollo-server';
 
-const USER_ADDED = 'USER_ADDED';
-const USER_UPDATED = 'USER_UPDATED';
-const USER_DELETED = 'USER_DELETED';
+import { NEW_MESSAGE } from './events'
 
 const pubsub = new PubSub();
 
 export default {
-  // newUser: {
-  //   subscribe: () =>  pubsub.asyncIterator([USER_ADDED]),
-  //   resolve: ({ user }) =>  user
-  // }
+  newMessage: {
+    resolve: (payload) => {
+      console.log(payload)
+      let response = {
+        isSuccess: true,
+        extension: {
+          opeartor: 'messageSended',
+          errors: []
+        }
+      }
+      return response
+    },
+    subscribe: () => pubsub.asyncIterator([NEW_MESSAGE])
+  }
 }

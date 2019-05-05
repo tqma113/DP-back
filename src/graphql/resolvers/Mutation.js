@@ -3,9 +3,9 @@ import moment from 'moment'
 import fs from 'fs'
 import path from 'path'
 
-const USER_ADDED = 'USER_ADDED';
-const USER_UPDATED = 'USER_UPDATED';
-const USER_DELETED = 'USER_DELETED';
+import database from '../../database/index'
+
+import { NEW_MESSAGE } from './events'
 
 const IMAGE_LOAD_PATH = __dirname + '/../../public/image'
 const JSON_LOAD_PATH = __dirname + '/../../public/JSON'
@@ -57,7 +57,7 @@ const writeJSONSync = (buffer) => new Promise((resolve, reject) => {
 })
 
 export default {
-  login: async (root, { username, password }, { dataSources, res }, info) => {
+  login: async (root, { username, password }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
     let user = {}
@@ -124,7 +124,7 @@ export default {
     
     return response
   },
-  loginWithEmail: async (root, { email, code, key }, { dataSources, res }, info) => {
+  loginWithEmail: async (root, { email, code, key },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
     let user = {}
@@ -198,7 +198,7 @@ export default {
     
     return response
   },
-  register: async (root, { username, nickname, avatar, gender, location, birthday, email, statement, u_key, e_key}, { dataSources }, info) => {
+  register: async (root, { username, nickname, avatar, gender, location, birthday, email, statement, u_key, e_key},  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let newUser = {
       username,
       nickname,
@@ -272,7 +272,7 @@ export default {
 
     return response
   },
-  setPassword: async (root, { email, password, key }, { dataSources }, info) => {
+  setPassword: async (root, { email, password, key },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
@@ -329,7 +329,7 @@ export default {
 
     return response
   },
-  checkUsername: async (root, { username }, { dataSources }, info) => {
+  checkUsername: async (root, { username },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
@@ -378,7 +378,7 @@ export default {
    
     return response
   },
-  checkUsernameValid: async (root, { username }, { dataSources }, info) => {
+  checkUsernameValid: async (root, { username },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
@@ -423,7 +423,7 @@ export default {
    
     return response
   },
-  sendEmailCode: async (root, { email }, { dataSources }, info) => {
+  sendEmailCode: async (root, { email },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
     try {
@@ -488,7 +488,7 @@ export default {
 
     return response
   },
-  sendEmailLoginCode: async (root, { email }, { dataSources }, info) => {
+  sendEmailLoginCode: async (root, { email },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
     try {
@@ -561,7 +561,7 @@ export default {
 
     return response
   },
-  ackEmail: async (root, { email, code, key }, { dataSources }, info) => {
+  ackEmail: async (root, { email, code, key },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
     try {
@@ -623,13 +623,34 @@ export default {
 
     return response
   },
-  logout: async (root, { username, token }, { dataSources }, info) => {
-    
-    return {
-      
+  logout: async (root, { },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+    let response = {}
+    let errors = []
+    if (sessionInfo && currentUser) {
+      dataSources.jwt.stale(currentUser.username)
+      response = {
+        isSuccess: true,
+        extension: {
+          operator: 'logout',
+          errors
+        }
+      }
+    } else {
+      errors.push({
+        path: 'logout',
+        message: 'auth info fail'
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: 'logout',
+          errors
+        }
+      }
     }
+    return response
   },
-  uploadSingleImage: async (root, { image }, { dataSources }, info) => {
+  uploadSingleImage: async (root, { image },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
@@ -664,21 +685,19 @@ export default {
 
     return response
   },
-  createArticle: async (root, { title, abstract, content, username, token, categoryIds }, { dataSources }, info) => {
+  createArticle: async (root, { title, abstract, content, categoryIds }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
     try {
-      let user = (await dataSources.database.user.selectUser({ username }, []))[0]
-      let sessionInfo = await dataSources.jwt.verify(username, token)
-      let isValid = !!sessionInfo && user && title && abstract && content && true
+      let isValid = !!sessionInfo && currentUser && title && abstract && content && true
 
       if (isValid) {
         let contentName = await writeJSONSync(content)
         let article = {
           title,
           abstract,
-          user_id: user.id,
+          user_id: currentUser.id,
           content: contentName
         }
 
@@ -688,7 +707,7 @@ export default {
 
           let categorys = await dataSources.database.articleCategory.createArticleCategorys(newArticle.id, categoryIds)
           if (categorys.affectedRows=== categoryIds.length) {
-            newArticle.user = user
+            newArticle.user = currentUser
             newArticle.project_link = []
             newArticle.categorys = categoryIds
             newArticle.comments = []
@@ -735,17 +754,10 @@ export default {
           }
         }
       } else {
-        if (!user) {
+        if (!user || !sessionInfo) {
           errors.push({
-            path: 'createArticle.username',
-            message: 'username is not exist'
-          })
-        }
-        
-        if (!sessionInfo) {
-          errors.push({
-            path: 'createArticle.token',
-            message: 'token is invalid'
+            path: 'createArticle',
+            message: 'auth fail'
           })
         }
 
@@ -798,7 +810,7 @@ export default {
 
     return response
   },
-  checkArticleIdValid: async (root, { id }, { dataSources }, info) => {
+  checkArticleIdValid: async (root, { id },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
@@ -842,17 +854,15 @@ export default {
 
     return response
   },
-  sendComment: async (root, { username, token, content, articleId }, { dataSources }, info) => {
+  sendComment: async (root, { content, articleId },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
     try {
-      let user = (await dataSources.database.user.selectUser({ username }, ['id']))[0]
-      let sessionInfo = await dataSources.jwt.verify(username, token)
-      let isValid = !!sessionInfo && user
+      let isValid = currentUser && sessionInfo
 
       if (isValid) {
-        let info = await dataSources.database.comment.createComment(user.id, content)
+        let info = await dataSources.database.comment.createComment(currentUser.id, content)
         await dataSources.database.articleComment.createArticleComments(articleId, [info.insertId])
         
         response = {
@@ -863,19 +873,10 @@ export default {
           }
         }
       } else {
-        if (!user) {
-          errors.push({
-            path: 'sendComment.username',
-            message: 'username is not exist'
-          })
-        }
-        
-        if (!sessionInfo) {
-          errors.push({
-            path: 'sendComment.token',
-            message: 'token is invalid'
-          })
-        }
+        errors.push({
+          path: 'sendComment',
+          message: 'auth is invalid'
+        })
 
         response = {
           sessionInfo: {
@@ -908,20 +909,18 @@ export default {
 
     return response
   },
-  articleStar: async (root, { username, token, articleId, status }, { dataSources }, info) => {
+  articleStar: async (root, { articleId, status },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
     try {
-      let user = (await dataSources.database.user.selectUser({ username }, ['id']))[0]
-      let sessionInfo = await dataSources.jwt.verify(username, token)
-      let isValid = !!sessionInfo && user
+      let isValid = currentUser && sessionInfo
 
       if (isValid) {
         if (status) {
-          await dataSources.database.articleCollection.deleteArticleCollections(articleId, [user.id])
+          await dataSources.database.articleCollection.deleteArticleCollections(articleId, [currentUser.id])
         } else {
-          await dataSources.database.articleCollection.createArticleCollections(articleId, [user.id])
+          await dataSources.database.articleCollection.createArticleCollections(articleId, [currentUser.id])
         }
 
         response = {
@@ -932,26 +931,12 @@ export default {
           }
         }
       } else {
-        if (!user) {
-          errors.push({
-            path: 'articleStar.username',
-            message: 'username is not exist'
-          })
-        }
-        
-        if (!sessionInfo) {
-          errors.push({
-            path: 'articleStar.token',
-            message: 'token is invalid'
-          })
-        }
+        errors.push({
+          path: 'articleStar',
+          message: 'auth fail'
+        })
 
         response = {
-          sessionInfo: {
-            username,
-            tiken: '',
-            isRefresh: false
-          },
           isSuccess: false,
           extension: {
             operator: 'articleStar',
@@ -976,20 +961,18 @@ export default {
 
     return response
   },
-  articleLike: async (root, { username, token, articleId, status = false }, { dataSources }, info) => {
+  articleLike: async (root, {articleId, status = false },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
     try {
-      let user = (await dataSources.database.user.selectUser({ username }, ['id']))[0]
-      let sessionInfo = await dataSources.jwt.verify(username, token)
-      let isValid = !!sessionInfo && user
+      let isValid = currentUser && sessionInfo
 
       if (isValid) {
         if (status) {
-          await dataSources.database.articleLike.deleteArticleLikes(articleId, [user.id])
+          await dataSources.database.articleLike.deleteArticleLikes(articleId, [currentUser.id])
         } else {
-          await dataSources.database.articleLike.createArticleLikes(articleId, [user.id])
+          await dataSources.database.articleLike.createArticleLikes(articleId, [currentUser.id])
         }
         
         response = {
@@ -1000,26 +983,12 @@ export default {
           }
         }
       } else {
-        if (!user) {
-          errors.push({
-            path: 'articleLike.username',
-            message: 'username is not exist'
-          })
-        }
-        
-        if (!sessionInfo) {
-          errors.push({
-            path: 'articleLike.token',
-            message: 'token is invalid'
-          })
-        }
+        errors.push({
+          path: 'articleStar',
+          message: 'auth fail'
+        })
 
         response = {
-          sessionInfo: {
-            username,
-            tiken: '',
-            isRefresh: false
-          },
           isSuccess: false,
           extension: {
             operator: 'articleLike',
@@ -1043,14 +1012,14 @@ export default {
 
     return response
   },
-  changeUserInfo: async (root, { email, key, nickname, location, gender, birthday, avatar, statement, eduBG, emRecords, categoryIds, industryIds, secQuestions }, { dataSources }, info) => {
+  changeUserInfo: async (root, { email, key, nickname, location, gender, birthday, avatar, statement, eduBG, emRecords, categoryIds, industryIds, secQuestions },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
     try {
       let user = (await dataSources.database.user.selectUser({ email }, ['id']))[0]
       let isValidEKey = await dataSources.Email.AckKey.check(email, key);
-      let isValid = user && isValidEKey
+      let isValid = currentUser && sessionInfo && user && isValidEKey && user.id == currentUser.id
 
       if (isValid) {
         if (nickname) {
@@ -1100,10 +1069,10 @@ export default {
           }
         }
       } else {
-        if (!user) {
+        if (!user || !sessionInfo) {
           errors.push({
-            path: 'changeUserInfo',
-            message: 'email is invalid'
+            path: 'createArticle',
+            message: 'auth fail'
           })
         }
         if (!isValidEKey) {
@@ -1137,20 +1106,18 @@ export default {
 
     return response
   },
-  userConcern: async (root, { username, token, userId, status }, { dataSources }, info) => {
+  userConcern: async (root, {userId, status },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
     try {
-      let user = (await dataSources.database.user.selectUser({ username }, ['id']))[0]
-      let sessionInfo = await dataSources.jwt.verify(username, token)
-      let isValid = !!sessionInfo && user
+      let isValid = currentUser && sessionInfo
 
       if (isValid) {
         if (status) {
-          await dataSources.database.userConcerned.deleteUserConcerned(user.id, userId)
+          await dataSources.database.userConcerned.deleteUserConcerned(currentUser.id, userId)
         } else {
-          await dataSources.database.userConcerned.createUserConcerneds(user.id, [userId])
+          await dataSources.database.userConcerned.createUserConcerneds(currentUser.id, [userId])
         }
         
         response = {
@@ -1161,26 +1128,12 @@ export default {
           }
         }
       } else {
-        if (!user) {
-          errors.push({
-            path: 'userConcern.username',
-            message: 'username is not exist'
-          })
-        }
-        
-        if (!sessionInfo) {
-          errors.push({
-            path: 'userConcern.token',
-            message: 'token is invalid'
-          })
-        }
+        errors.push({
+          path: 'userConcern',
+          message: 'auth fail'
+        })
 
         response = {
-          sessionInfo: {
-            username,
-            tiken: '',
-            isRefresh: false
-          },
           isSuccess: false,
           extension: {
             operator: 'userConcern',
@@ -1205,20 +1158,18 @@ export default {
 
     return response
   },
-  categoryStar: async (root, { username, token, categoryId, status }, { dataSources }, info) => {
+  categoryStar: async (root, { categoryId, status },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
     try {
-      let user = (await dataSources.database.user.selectUser({ username }, ['id']))[0]
-      let sessionInfo = await dataSources.jwt.verify(username, token)
-      let isValid = !!sessionInfo && user
+      let isValid = currentUser && sessionInfo
 
       if (isValid) {
         if (status) {
-          await dataSources.database.userCategory.deleteUserCategorys(user.id, categoryId)
+          await dataSources.database.userCategory.deleteUserCategorys(currentUser.id, categoryId)
         } else {
-          await dataSources.database.userCategory.createUserCategorys(user.id, [categoryId])
+          await dataSources.database.userCategory.createUserCategorys(currentUser.id, [categoryId])
         }
         
         response = {
@@ -1229,26 +1180,12 @@ export default {
           }
         }
       } else {
-        if (!user) {
-          errors.push({
-            path: 'categoryStar.username',
-            message: 'username is not exist'
-          })
-        }
-        
-        if (!sessionInfo) {
-          errors.push({
-            path: 'categoryStar.token',
-            message: 'token is invalid'
-          })
-        }
+        errors.push({
+          path: 'categoryStar',
+          message: 'auth fail'
+        })
 
         response = {
-          sessionInfo: {
-            username,
-            tiken: '',
-            isRefresh: false
-          },
           isSuccess: false,
           extension: {
             operator: 'categoryStar',
@@ -1272,14 +1209,12 @@ export default {
 
     return response
   },
-  industryStar: async (root, { username, token, industryId, status }, { dataSources }, info) => {
+  industryStar: async (root, { industryId, status },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
     try {
-      let user = (await dataSources.database.user.selectUser({ username }, ['id']))[0]
-      let sessionInfo = await dataSources.jwt.verify(username, token)
-      let isValid = !!sessionInfo && user
+      let isValid = currentUser && sessionInfo
 
       if (isValid) {
         if (status) {
@@ -1296,26 +1231,13 @@ export default {
           }
         }
       } else {
-        if (!user) {
-          errors.push({
-            path: 'industryStar.username',
-            message: 'username is not exist'
-          })
-        }
+        errors.push({
+          path: 'industryStar',
+          message: 'auth fail'
+        })
         
-        if (!sessionInfo) {
-          errors.push({
-            path: 'industryStar.token',
-            message: 'token is invalid'
-          })
-        }
 
         response = {
-          sessionInfo: {
-            username,
-            tiken: '',
-            isRefresh: false
-          },
           isSuccess: false,
           extension: {
             operator: 'industryStar',
@@ -1333,6 +1255,65 @@ export default {
         isSuccess: false,
         extension: {
           operator: "industry star",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  sendMessage: async (root, { userId, message},  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info ) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let acceptUser = (await dataSources.database.user.selectUser({ id: userId }, ['username']))[0]
+      let isValid = !!sessionInfo && currentUser && acceptUser
+
+      if (isValid) {
+        let info = await dataSources.database.message.createMessage(user.id, userId, message)
+        pubsub.publish(NEW_MESSAGE, { userId, message, sendUserId: user.id })
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: "send message",
+            errors
+          }
+        }
+      } else {
+        if (!user || !sessionInfo) {
+          errors.push({
+            path: 'sendMessage',
+            message: 'auth fail'
+          })
+        }
+
+        if (!acceptUser) {
+          errors.push({
+            path: 'sendMessage.userId',
+            message: 'accept user is not exist'
+          })
+        }
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'sendMessage',
+            errors
+          }
+        }
+      }
+
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'sendMessage',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "send message",
           errors
         }
       }

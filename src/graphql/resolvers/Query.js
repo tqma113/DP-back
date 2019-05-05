@@ -15,7 +15,7 @@ const readJSONAsync = (filename) => new Promise((resolve, reject) => {
 })
 
 export default {
-  checkLoginState: async (root, { username, token }, { dataSources }, info) => {
+  init: async (root, { }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
     const queryAsync = async (i) => {
@@ -64,19 +64,10 @@ export default {
       return i
     }
     try {
-      let user = {}
-
-      if (username.indexOf('@') !== -1) {
-        user = (await dataSources.database.user.selectUser({ email: username }, ['password']))[0]
-      } else {
-        user = (await dataSources.database.user.selectUser({ username }, ['password']))[0]
-      }
-  
-      let sessionInfo = await dataSources.jwt.verify(username, token)
-      let isValid = !!sessionInfo && user
+      let isValid = !!sessionInfo && currentUser
 
       if (isValid) {
-        user = (await dataSources.database.user.selectUser({ username }, []))[0]        
+        let user = currentUser
         user = await queryAsync(user)
 
         response = {
@@ -93,19 +84,10 @@ export default {
           }
         }
       } else {
-        if (!user) {
-          errors.push({
-            path: 'checkLoginState.username',
-            message: 'username is not exist'
-          })
-        }
-        
-        if (!sessionInfo) {
-          errors.push({
-            path: 'checkLoginState.token',
-            message: 'token is invalid'
-          })
-        }
+        errors.push({
+          path: 'sendMessage',
+          message: 'auth fail'
+        })
 
         response = {
           sessionInfo: {
@@ -142,7 +124,7 @@ export default {
     
     return response
   },
-  users: async (root, { usernames, categoryIds, industryIds }, { dataSources }, info) => {
+  users: async (root, { usernames, categoryIds, industryIds }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
     
@@ -246,7 +228,7 @@ export default {
     // console.log(response)
     return response
   },
-  categorys: async (root, { }, { dataSources }, info) => {
+  categorys: async (root, { }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
     try {
@@ -280,7 +262,7 @@ export default {
     }
     return response
   },
-  industrys: async (root, { }, { dataSources }, info) => {
+  industrys: async (root, { }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
     try {
@@ -314,7 +296,7 @@ export default {
     }
     return response
   },
-  articles: async (root, { idList, categoryIds }, { dataSources }, info) => {
+  articles: async (root, { idList, categoryIds }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 

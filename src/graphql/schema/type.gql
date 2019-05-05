@@ -163,6 +163,9 @@ type Response {
   industrys: [Industry]
   articles: [Article]
 
+  message: Message
+  messages: [Message]
+
   isSuccess: Boolean!
   extension: Extension!
   code: Int
