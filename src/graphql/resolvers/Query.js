@@ -71,11 +71,6 @@ export default {
         user = await queryAsync(user)
 
         response = {
-          sessionInfo: {
-            username,
-            token,
-            isRefresh: false
-          },
           user,
           isSuccess: true,
           extension: {
@@ -90,11 +85,6 @@ export default {
         })
 
         response = {
-          sessionInfo: {
-            username,
-            tiken: '',
-            isRefresh: false
-          },
           isSuccess: false,
           extension: {
             operator: 'checkLoginState',
@@ -109,11 +99,6 @@ export default {
         message: JSON.stringify(err)
       })
       response = {
-        sessionInfo: {
-          username,
-          tiken: '',
-          isRefresh: false
-        },
         isSuccess: false,
         extension: {
           operator: 'checkLoginState',

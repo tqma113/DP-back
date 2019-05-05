@@ -118,16 +118,18 @@ type Comment {
 
 type Message {
   id: ID!
-  send_user: User
-  accept_user: User
+  sendUser: User
+  acceptUser: User
+  s_user_id: Int
+  a_user_id: Int
   content: String
-  send_at: Date
+  send_time: Date
 }
 
 type SessionInfo {
-  username: String!
+  username: String
   token: String
-  isRefresh: Boolean!
+  isRefresh: Boolean
 }
 
 type UploadInfo {

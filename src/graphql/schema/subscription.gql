@@ -1,3 +1,5 @@
 type Subscription {
-  newMessage(username: String!, token: String!): Response!
+  newMessage(userId: Int!): Response!
+
+  userStatusChange(userId: Int!): Response!
 }

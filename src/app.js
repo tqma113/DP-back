@@ -110,20 +110,20 @@ const apollo = new ApolloServer({
     return response;
   },
   context: async ({ req, res }) => {
-    let user = {}
+    let user = false
+    let info = false
     let errors = []
-    let token = req.headers.authorization || ''
-    let username = req.headers.username || ''
+    let token = (req && req.headers && req.headers.authorization) || ''
+    let username = (req && req.headers && req.headers.username) || ''
     try {
-      let info = jwt.verify(username, token)
+      info = await jwt.verify(username, token)
       if (info) {
-        let currentUser = await user.selectUser({username}, [])
-        user = currentUser
+        user = (await database.user.selectUser({ username }, []))[0]
       }
     } catch (err) {
+      console.log(err)
       errors = [err]
     }
-
     return { res, req, errors, currentUser: user, sessionInfo: info }
   },
   dataSources: () => {

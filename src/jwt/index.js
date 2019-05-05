@@ -61,6 +61,7 @@ const verify = async (username, token) => {
   if (!info || !varifyInfo || info.jwtId !== varifyInfo.code || info.username !== username) {
     return false
   }
+  info.token = token
   
   return info
 }

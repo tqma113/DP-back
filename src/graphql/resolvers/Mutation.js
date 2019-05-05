@@ -1,7 +1,7 @@
-import { PubSub, withFilter } from 'apollo-server';
 import moment from 'moment'
 import fs from 'fs'
 import path from 'path'
+import getPubSub from './PubSub'
 
 import database from '../../database/index'
 
@@ -9,8 +9,6 @@ import { NEW_MESSAGE } from './events'
 
 const IMAGE_LOAD_PATH = __dirname + '/../../public/image'
 const JSON_LOAD_PATH = __dirname + '/../../public/JSON'
-
-const pubsub = new PubSub();
 
 const getRandomFilename = (mimetype) => {
   const all = 'qwertyuiopasdfghjklzxcvbnm-1234567890'
@@ -23,6 +21,8 @@ const getRandomFilename = (mimetype) => {
 
   return filename + suffix
 }
+
+const pubsub = getPubSub()
 
 const getRandomFilenameWithSuffix = (suffix) => {
   const all = 'qwertyuiopasdfghjklzxcvbnm-1234567890'
@@ -1218,9 +1218,9 @@ export default {
 
       if (isValid) {
         if (status) {
-          await dataSources.database.userIndustry.deleteUserIndustry(user.id, industryId)
+          await dataSources.database.userIndustry.deleteUserIndustry(currentUser.id, industryId)
         } else {
-          await dataSources.database.userIndustry.createUserIndustrys(user.id, [industryId])
+          await dataSources.database.userIndustry.createUserIndustrys(currentUser.id, [industryId])
         }
         
         response = {
@@ -1271,8 +1271,8 @@ export default {
       let isValid = !!sessionInfo && currentUser && acceptUser
 
       if (isValid) {
-        let info = await dataSources.database.message.createMessage(user.id, userId, message)
-        pubsub.publish(NEW_MESSAGE, { userId, message, sendUserId: user.id })
+        pubsub.publish(NEW_MESSAGE, { userId, message, sendUserId: currentUser.id })
+        let info = await dataSources.database.message.createMessage(currentUser.id, userId, message)
         response = {
           isSuccess: true,
           extension: {
