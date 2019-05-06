@@ -1,5 +1,5 @@
 type Subscription {
-  newMessage(userId: Int!): Response!
+  newMessage: Message!
 
   userStatusChange(userId: Int!): Response!
 }

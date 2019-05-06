@@ -46,34 +46,34 @@ const apollo = new ApolloServer({
   subscriptions: {
     path: '/subscriptions',
     // keepAlive: 20,
-    onConnect: (connectionParams, webSocket, context) => new Promise((resolve, reject) => {
+    onConnect: (connectionParams, webSocket, context) => {
       // GraphQL鉴权
-      try {
-        if (connectionParams.authToken && connectionParams.username) {
-          jwt.verify(connectionParams.username, connectionParams.authToken)
+      if (connectionParams.authToken && connectionParams.username) {
+
+        try {
+          return jwt.verify(connectionParams.username, connectionParams.authToken)
             .then(info => {
               if (info) {
                 return database.user.selectUsersByUsernames([connectionParams.username])
                 .then(users => {
                   database.user.updateUserById(users[0].id, 'status', 1)
-                  resolve({
-                    connectionParams,
-                    webSocket,
-                    context,
-                    user: users[0],
+
+                  return ({
+                    currentUser: users[0],
                     sessionInfo: info
                   })
                 })
-              } else {
-                reject(false)
               }
+              throw new Error('Missing auth token!');
             });
-        }
 
-      } catch(err) {
-        reject(err)
+        } catch(err) {
+          throw new Error('Missing auth token!', err);
+        }
       }
-    }),
+
+      throw new Error('Missing auth token');
+    },
     onDisconnect: async (webSocket, context) => {
       // 
       try {
@@ -109,10 +109,15 @@ const apollo = new ApolloServer({
     // console.log(response);
     return response;
   },
-  context: async ({ req, res }) => {
+  context: async ({req, res, connection}) => {
+
+    if (connection) {
+      return connection.context
+    }
     let user = false
     let info = false
     let errors = []
+
     let token = (req && req.headers && req.headers.authorization) || ''
     let username = (req && req.headers && req.headers.username) || ''
     try {

@@ -7,21 +7,13 @@ const pubsub = getPubSub()
 export default {
   newMessage: {
     resolve: (payload) => {
-      console.log(payload)
-      let response = {
-        isSuccess: true,
-        extension: {
-          operator: 'messageSended',
-          errors: []
-        }
-      }
+      let response = payload
       return response
     },
     subscribe: withFilter(
       () => pubsub.asyncIterator([NEW_MESSAGE]),
-      (payload, variables) => {
-        console.log(payload, variables)
-        return true;
+      (payload, variables, { currentUser, sessionInfo }, websocket) => {
+        return currentUser && sessionInfo && payload && payload.a_user_id && payload.a_user_id == currentUser.id
       },
     )
   },

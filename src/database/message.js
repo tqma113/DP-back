@@ -14,6 +14,26 @@ const createMessage = (userId, acceptUserId, content) => new Promise((resolve, r
   });
 })
 
+const selectMeesageById = (id) => new Promise((resolve, reject) => {
+  query({
+    sql: 'SELECT * FROM `message` WHERE `id` = ?',
+    values: [id]
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
 const selectMeesageBySUserId = (user_id) => new Promise((resolve, reject) => {
   query({
     sql: 'SELECT * FROM `message` WHERE `s_user_id` = ?',
@@ -54,9 +74,30 @@ const selectMessageByAUserId = (user_id) => new Promise((resolve, reject) => {
   });
 });
 
+
+const selectMessageByASUserId = (a_user_id, s_user_id) => new Promise((resolve, reject) => {
+  query({
+    sql: 'SELECT * FROM `message` WHERE (`a_user_id` = ? AND `s_user_id` = ?) OR (`a_user_id` = ? AND `s_user_id` = ?)',
+    values: [a_user_id, s_user_id, s_user_id, a_user_id]
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
 const deleteMessage = (user_id, acceptUserId) => new Promise((resolve, reject) => {
   query({
-    sql: 'DELETE FROM `message` WHERE `s_user_id` = ? AND `a_user_id` ?',
+    sql: 'DELETE FROM `message` WHERE (`s_user_id` = ? AND `a_user_id` = ?)',
     values: [user_id, acceptUserId]
   })
   .then((res) => {
@@ -76,7 +117,9 @@ const deleteMessage = (user_id, acceptUserId) => new Promise((resolve, reject) =
 
 export default {
   createMessage,
+  selectMeesageById,
   selectMeesageBySUserId,
   selectMessageByAUserId,
+  selectMessageByASUserId,
   deleteMessage
 }

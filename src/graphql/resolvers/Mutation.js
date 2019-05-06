@@ -1267,18 +1267,29 @@ export default {
     let errors = []
 
     try {
-      let acceptUser = (await dataSources.database.user.selectUser({ id: userId }, ['username']))[0]
+      let acceptUser = (await dataSources.database.user.selectUser({ id: userId }, []))[0]
       let isValid = !!sessionInfo && currentUser && acceptUser
 
       if (isValid) {
-        pubsub.publish(NEW_MESSAGE, { userId, message, sendUserId: currentUser.id })
         let info = await dataSources.database.message.createMessage(currentUser.id, userId, message)
-        response = {
-          isSuccess: true,
-          extension: {
-            operator: "send message",
-            errors
+        if (info) {
+          let messageObj = (await dataSources.database.message.selectMeesageById(info.insertId))[0]
+          messageObj.acceptUser = acceptUser
+          messageObj.sendUser = currentUser
+          pubsub.publish(NEW_MESSAGE, messageObj)
+
+          response = {
+            isSuccess: true,
+            extension: {
+              operator: "send message",
+              errors
+            }
           }
+        } else {
+          errors.push({
+            path: 'sendMessage',
+            message: 'server error'
+          })
         }
       } else {
         if (!user || !sessionInfo) {
