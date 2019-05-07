@@ -81,7 +81,7 @@ const apollo = new ApolloServer({
         if (info && info.user) {
           database.user.updateUserById(info.user.id, 'status', 0)
         } else {
-          console.log('somethings wrong')
+          console.log('disconnected without auth')
         }
       } catch (err) {
         console.log(err)

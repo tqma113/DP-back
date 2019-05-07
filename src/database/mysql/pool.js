@@ -6,7 +6,7 @@ const pool = mysql.createPool({
   password: 'mtq123',
   port: '3306',
   database: 'dp_blog',
-  // charset: 'UTF8_GENERAL_CL',
+  charset : 'utf8mb4',
   connectTimeout: 1000000,
   stringifyObjects: true,
   typeCast: true,
