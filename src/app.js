@@ -72,13 +72,13 @@ const apollo = new ApolloServer({
         }
       }
 
-      throw new Error('Missing auth token');
+      console.log('Missing auth token');
     },
     onDisconnect: async (webSocket, context) => {
       // 
       try {
         let info = await context.initPromise
-        if (info.user) {
+        if (info && info.user) {
           database.user.updateUserById(info.user.id, 'status', 0)
         } else {
           console.log('somethings wrong')

@@ -92,6 +92,7 @@ type Article {
   id: ID!
   title: String!
   abstract: String!
+  image: String
   content: JSON
   release_time: Date
   last_modify_time: Date

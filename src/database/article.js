@@ -69,12 +69,13 @@ const selectArticlesByUserIds = (idArr) => new Promise((resolve, reject) => {
 
 const createArticle = (article) => new Promise((resolve, reject) => {
   query({
-    sql: 'INSERT INTO `article` (`title`, `abstract`, `content`, `user_id`) VALUES (?, ?, ?, ?)',
+    sql: 'INSERT INTO `article` (`title`, `abstract`, `content`, `user_id`, `image`) VALUES (?, ?, ?, ?, ?)',
     values: [
       article.title,
       article.abstract,
       article.content,
-      article.user_id
+      article.user_id,
+      article.image
     ]
   })
   .then((res) => {

@@ -36,7 +36,8 @@ type Mutation {
     title: String!,
     abstract: String!,
     content: String!,
-    categoryIds: [Int]!
+    categoryIds: [Int]!,
+    image: String!
   ): Response!
 
   checkArticleIdValid(id: Int!): Response!
@@ -70,4 +71,6 @@ type Mutation {
   industryStar(industryId: Int!, status: Boolean!): Response!
 
   sendMessage(userId: Int!, message: String!): Response!
+
+  commentLike(commentId: Int!, status: Boolean!): Response!
 }

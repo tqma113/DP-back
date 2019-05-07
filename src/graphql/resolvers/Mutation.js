@@ -685,7 +685,7 @@ export default {
 
     return response
   },
-  createArticle: async (root, { title, abstract, content, categoryIds }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+  createArticle: async (root, { title, abstract, content, categoryIds, image }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
@@ -698,7 +698,8 @@ export default {
           title,
           abstract,
           user_id: currentUser.id,
-          content: contentName
+          content: contentName,
+          image
         }
 
         let newArticle = await dataSources.database.article.createArticle(article)
@@ -1325,6 +1326,59 @@ export default {
         isSuccess: false,
         extension: {
           operator: "send message",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  commentLike: async (root, { commentId, status},  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info ) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let isValid = currentUser && sessionInfo
+
+      if (isValid) {
+        if (status) {
+          await dataSources.database.commentLike.deleteCommentslike(currentUser.id, commentId)
+        } else {
+          await dataSources.database.commentLike.createCommentsLike(currentUser.id, commentId)
+        }
+        
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'commentLike',
+            errors
+          }
+        }
+      } else {
+        errors.push({
+          path: 'commentLike',
+          message: 'auth fail'
+        })
+        
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'commentLike',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'commentLike',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "commentLike",
           errors
         }
       }

@@ -1,7 +1,7 @@
 type Query {
   init: Response!
 
-  users(usernames: [String], categoryIds: [Int], industryIds: [Int]): Response!
+  users(idList: [Int], usernames: [String], categoryIds: [Int], industryIds: [Int]): Response!
 
   categorys: Response!
 

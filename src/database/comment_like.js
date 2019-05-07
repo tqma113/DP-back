@@ -57,8 +57,23 @@ const selectCommentLikeByUserId = (user_id) => new Promise((resolve, reject) => 
   });
 });
 
+const deleteCommentslike = (userId, commentId) => new Promise((resolve, reject) => {
+  let sql = 'DELETE FROM `comment_like` WHERE `user_id` = ? AND `comment_id` = ?'
+  query({
+    sql,
+    values: [userId, commentId]
+  })
+  .then((res) => {
+    resolve(res)
+  })
+  .catch((err) => {
+    reject(err)
+  });
+})
+
 export default {
   createCommentsLike,
   selectCommentLikeByCommentId,
-  selectCommentLikeByUserId
+  selectCommentLikeByUserId,
+  deleteCommentslike
 }
