@@ -56,6 +56,10 @@ const writeJSONSync = (buffer) => new Promise((resolve, reject) => {
   })
 })
 
+const deleteJSON = (filename) => {
+  fs.unlinkSync(path.resolve(JSON_LOAD_PATH, filename));
+}
+
 export default {
   login: async (root, { username, password }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
@@ -708,13 +712,6 @@ export default {
 
           let categorys = await dataSources.database.articleCategory.createArticleCategorys(newArticle.id, categoryIds)
           if (categorys.affectedRows=== categoryIds.length) {
-            newArticle.user = currentUser
-            newArticle.project_link = []
-            newArticle.categorys = categoryIds
-            newArticle.comments = []
-            newArticle.likes = []
-            newArticle.collections = []
-    
             response = {
               article: newArticle,
               isSuccess: true,
@@ -811,7 +808,7 @@ export default {
 
     return response
   },
-  checkArticleIdValid: async (root, { id },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+  checkArticleIdValid: async (root, { id, userId },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
     let response = {}
     let errors = []
 
@@ -819,18 +816,37 @@ export default {
       let article = (await dataSources.database.article.selectArticlesByIds([id]))[0]
 
       if (article) {
-        response = {
-          isSuccess: true,
-          extension: {
-            operator: "check article id if usable",
-            errors
+        if (userId && article.user_id !== userId) {
+          if (article.user_id !== userId) {
+            errors.push({
+              path: 'checkArticleIdValid',
+              message: 'no permission'
+            })
+            response = {
+              isSuccess: false,
+              extension: {
+                operator: "check article id if usable",
+                errors
+              }
+            }
+          }
+        } else {
+          response = {
+            isSuccess: true,
+            extension: {
+              operator: "check article id if usable",
+              errors
+            }
           }
         }
       } else {
-        errors.push({
-          path: 'checkArticleIdValid',
-          message: 'article is not exist'
-        })
+        if (!article) {
+          errors.push({
+            path: 'checkArticleIdValid',
+            message: 'article is not exist'
+          })
+        }
+        
         response = {
           isSuccess: false,
           extension: {
@@ -1385,5 +1401,137 @@ export default {
     }
 
     return response
-  }
+  },
+  editArticle: async (root, { id, title, abstract, content, categoryIds, image }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let article
+      if (id && typeof id === 'number') {
+        article = (await dataSources.database.article.selectArticlesByIds([id]))[0]
+      }
+      let isValid = id && typeof id === 'number' && article && !!sessionInfo && currentUser && title && abstract && content && true
+
+      if (isValid) {
+        deleteJSON(article.content)
+        let contentName = await writeJSONSync(content)
+        let article = {
+          title,
+          abstract,
+          user_id: currentUser.id,
+          content: contentName,
+          image,
+          id
+        }
+
+        let newArticle = await dataSources.database.article.updateArticle(article)
+
+        if (newArticle) {
+          await dataSources.database.articleCategory.deleteArticleCategorysByArticleId(id)
+          let categorys = await dataSources.database.articleCategory.createArticleCategorys(id, categoryIds)
+          if (categorys.affectedRows=== categoryIds.length) {
+            response = {
+              article: newArticle,
+              isSuccess: true,
+              extension: {
+                operator: 'editArticle',
+                errors
+              }
+            }
+          } else {
+            dataSources.database.article.deleteArticleById(newArticle.id)
+            errors.push({
+              path: 'editArticle',
+              message: 'article category setfail'
+            })
+      
+            response = {
+              article: {},
+              isSuccess: false,
+              extension: {
+                operator: "editArticle",
+                errors
+              }
+            }
+          }
+        } else {
+          errors.push({
+            path: 'editArticle',
+            message: 'editArticle fail'
+          })
+    
+          response = {
+            article: {},
+            isSuccess: false,
+            extension: {
+              operator: "editArticle",
+              errors
+            }
+          }
+        }
+      } else {
+        if (!user || !sessionInfo) {
+          errors.push({
+            path: 'editArticle',
+            message: 'auth fail'
+          })
+        }
+
+        if (!title) {
+          errors.push({
+            path: 'createArticle.title',
+            message: 'title is invalid'
+          })
+        }
+
+        if (!abstract) {
+          errors.push({
+            path: 'createArticle.abstract',
+            message: 'abstract is invalid'
+          })
+        }
+
+        if (!content) {
+          errors.push({
+            path: 'createArticle.content',
+            message: 'content is invalid'
+          })
+        }
+
+        if (!id || !article) {
+          errors.push({
+            path: 'createArticle.content',
+            message: 'article is not exist'
+          })
+        }
+
+        response = {
+          article: {},
+          isSuccess: false,
+          extension: {
+            operator: 'createArticle',
+            errors
+          }
+        }
+      }
+
+    } catch (err) {
+      errors.push({
+        path: 'createArticle',
+        message: JSON.stringify(err)
+      })
+
+      response = {
+        article: {},
+        isSuccess: false,
+        extension: {
+          operator: "create article",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
 }

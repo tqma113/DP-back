@@ -88,6 +88,29 @@ const createArticle = (article) => new Promise((resolve, reject) => {
   });
 })
 
+const updateArticle = (article) => new Promise((resolve, reject) => {
+  query({
+    sql: 'UPDATE `article` SET `title`=?, `abstract`=?, `content`=?, `user_id`=?, `image`=? WHERE `id`=?',
+    values: [
+      article.title,
+      article.abstract,
+      article.content,
+      article.user_id,
+      article.image,
+      article.id
+    ]
+  })
+  .then((res) => {
+    console.log(res)
+    selectArticlesByIds([res.insertId]).then((res) => {
+      resolve(res[0])
+    })
+  })
+  .catch((err) => {
+    reject(err)
+  });
+})
+
 const deleteArticleById = (id) => new Promise((resolve, reject) => {
   selectArticlesByIds([id]).then((res) => {
     if (res[0]) {
@@ -111,5 +134,6 @@ export default {
   selectArticlesByIds,
   selectArticlesByUserIds,
   createArticle,
-  deleteArticleById
+  deleteArticleById,
+  updateArticle
 }
