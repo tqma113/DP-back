@@ -101,8 +101,7 @@ const updateArticle = (article) => new Promise((resolve, reject) => {
     ]
   })
   .then((res) => {
-    console.log(res)
-    selectArticlesByIds([res.insertId]).then((res) => {
+    selectArticlesByIds([article.id]).then((res) => {
       resolve(res[0])
     })
   })

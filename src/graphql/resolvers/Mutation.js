@@ -1412,11 +1412,10 @@ export default {
         article = (await dataSources.database.article.selectArticlesByIds([id]))[0]
       }
       let isValid = id && typeof id === 'number' && article && !!sessionInfo && currentUser && title && abstract && content && true
-
       if (isValid) {
         deleteJSON(article.content)
         let contentName = await writeJSONSync(content)
-        let article = {
+        let newArticle = {
           title,
           abstract,
           user_id: currentUser.id,
@@ -1425,7 +1424,7 @@ export default {
           id
         }
 
-        let newArticle = await dataSources.database.article.updateArticle(article)
+        newArticle = await dataSources.database.article.updateArticle(newArticle)
 
         if (newArticle) {
           await dataSources.database.articleCategory.deleteArticleCategorysByArticleId(id)
@@ -1517,13 +1516,13 @@ export default {
       }
 
     } catch (err) {
+      console.log(err)
       errors.push({
         path: 'createArticle',
         message: JSON.stringify(err)
       })
 
       response = {
-        article: {},
         isSuccess: false,
         extension: {
           operator: "create article",
