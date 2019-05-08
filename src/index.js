@@ -1,2 +1,2 @@
 require('babel-register');
-require('./app.js');
+require('child_process').exec( `babel-node src/index.js` );
