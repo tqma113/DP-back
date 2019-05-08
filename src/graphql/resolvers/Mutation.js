@@ -5,7 +5,7 @@ import getPubSub from './PubSub'
 
 import database from '../../database/index'
 
-import { NEW_MESSAGE } from './events'
+import { NEW_MESSAGE, USER_LOGOUT, NEW_ARTICLE } from './events'
 
 const IMAGE_LOAD_PATH = __dirname + '/../../public/image'
 const JSON_LOAD_PATH = __dirname + '/../../public/JSON'
@@ -632,6 +632,8 @@ export default {
     let errors = []
     if (sessionInfo && currentUser) {
       dataSources.jwt.stale(currentUser.username)
+      currentUser.status = 0
+      pubsub.publish(USER_LOGOUT, currentUser)
       response = {
         isSuccess: true,
         extension: {
@@ -712,6 +714,8 @@ export default {
 
           let categorys = await dataSources.database.articleCategory.createArticleCategorys(newArticle.id, categoryIds)
           if (categorys.affectedRows=== categoryIds.length) {
+            newArticle.categorys = categoryIds
+            pubsub.publish(NEW_ARTICLE, newArticle)
             response = {
               article: newArticle,
               isSuccess: true,
@@ -728,7 +732,6 @@ export default {
             })
       
             response = {
-              article: {},
               isSuccess: false,
               extension: {
                 operator: "create article",
@@ -743,7 +746,6 @@ export default {
           })
     
           response = {
-            article: {},
             isSuccess: false,
             extension: {
               operator: "create article",
@@ -781,7 +783,6 @@ export default {
         }
 
         response = {
-          article: {},
           isSuccess: false,
           extension: {
             operator: 'createArticle',
@@ -791,13 +792,13 @@ export default {
       }
 
     } catch (err) {
+      console.log(err)
       errors.push({
         path: 'createArticle',
         message: JSON.stringify(err)
       })
 
       response = {
-        article: {},
         isSuccess: false,
         extension: {
           operator: "create article",

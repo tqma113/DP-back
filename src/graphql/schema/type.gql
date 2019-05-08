@@ -9,6 +9,7 @@ type User {
   register_at: Date!
   last_login_at: Date!
   avatar: String
+  status: Int
   statement: String
   email: String!
   eduBG: [EduBG]!
@@ -96,6 +97,7 @@ type Article {
   content: JSON
   release_time: Date
   last_modify_time: Date
+  user_id: Int
   user: User
   project_link: [String]
   categorys: [Int]!

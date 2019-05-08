@@ -1,7 +1,7 @@
 export const NEW_MESSAGE = 'NEW_MESSAGE'
 
-export const USER_ADDED = 'USER_ADDED';
-export const USER_UPDATED = 'USER_UPDATED';
-export const USER_DELETED = 'USER_DELETED';
+export const NEW_USER_LOGIN = 'NEW_USER_LOGIN'
 
-export const USER_STATUS_CHANGE = 'USER_STATUS_CHANGE'
+export const USER_LOGOUT = 'USER_LOGOUT'
+
+export const NEW_ARTICLE = 'NEW_ARTICLE'

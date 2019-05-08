@@ -14,13 +14,14 @@ import child_process from 'child_process'
 // import { listenerCount } from 'cluster';
 
 import database from './database';
+import getPubSub from './graphql/resolvers/PubSub'
+import { NEW_USER_LOGIN, USER_LOGOUT } from './graphql/resolvers/events'
 
 import CheckUsernameKey from './key/check_username';
 import CheckEmailKey from './key/check_email'
 
 import Email from './email/index'
 import jwt from './jwt/index'
-
 
 const configurations = {
   // Note: You may need sudo to run on port 443
@@ -39,6 +40,21 @@ const corsOptions = {
 }
 
 const redisClear = './src/redis/clear.js'
+const PubSub = getPubSub()
+
+const queryAsync = async (i) => {
+  i.industrys =  (await database.userIndustry.selectUserIndustrysByUserId(i.id)).map(item => item.industry_id)
+  i.eduBG = await database.eduBG.selectEduBGsByUserId(i.id)
+  i.emRecords = await database.emRecord.selectEmRecordsByUserId(i.id)
+  i.articles = await database.article.selectArticlesByUserIds([i.id])
+  i.categorys = (await database.userCategory.selectUserCategorysByUserId(i.id)).map(item => item.category_id)
+  i.concerned = await database.userConcerned.selectUserConcernedsByUserId(i.id)
+  i.concern = await database.userConcerned.selectUserConcernedsByConcernedUserId(i.id)
+  i.likes = await database.articleLike.selectArticleLikesByUserId(i.id)
+  i.collections = await database.articleCollection.selectArticleCollectionsByUserId(i.id)
+  i.dynamics = []
+  return i
+}
 
 const apollo = new ApolloServer({ 
   typeDefs, 
@@ -56,8 +72,13 @@ const apollo = new ApolloServer({
               if (info) {
                 return database.user.selectUsersByUsernames([connectionParams.username])
                 .then(users => {
-                  database.user.updateUserById(users[0].id, 'status', 1)
-
+                  let user = users[0]
+                  user = queryAsync(user)
+                  if (user.statue === 0) {
+                    database.user.updateUserById(users[0].id, 'status', 1)
+                    user.status = 1
+                    pubsub.publish(NEW_USER_LOGIN, user)
+                  }
                   return ({
                     currentUser: users[0],
                     sessionInfo: info
@@ -80,6 +101,8 @@ const apollo = new ApolloServer({
         let info = await context.initPromise
         if (info && info.user) {
           database.user.updateUserById(info.user.id, 'status', 0)
+          user.status = 0
+          pubsub.publish(USER_LOGOUT, user)
         } else {
           console.log('disconnected without auth')
         }

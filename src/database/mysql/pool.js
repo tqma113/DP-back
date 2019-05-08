@@ -1,7 +1,15 @@
 import mysql from 'mysql';
 
+const configurations = {
+  // Note: You may need sudo to run on port 443
+  production: 'localhost',
+  development: 'www.matianqi.com'
+}
+
+const environment = process.env.NODE_ENV || 'production'
+
 const pool = mysql.createPool({
-  host: '127.0.0.1',
+  host: configurations[environment],
   user: 'root',
   password: 'mtq123',
   port: '3306',
