@@ -33,7 +33,7 @@ const config = configurations[environment]
 
 // 跨域配置信息
 const corsOptions = {
-  origin: 'https://matianqi.com:80',
+  origin: 'http://matianqi.com',
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true
 }
