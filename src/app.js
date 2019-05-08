@@ -26,7 +26,7 @@ import jwt from './jwt/index'
 const configurations = {
   // Note: You may need sudo to run on port 443
   development: { ssl: false, port: 4000, hostname: 'localhost' },
-  production: { ssl: false, port: 4000, hostname: 'www.matianqi.com' }
+  production: { ssl: false, port: 4430, hostname: 'www.matianqi.com' }
 }
 
 const environment = process.env.NODE_ENV || 'production'
