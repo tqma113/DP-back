@@ -1,7 +1,7 @@
 import mysql from 'mysql';
 
 const pool = mysql.createPool({
-  host: '127.0.0.1',
+  host: 'blog.matianqi.com',
   user: 'root',
   password: 'mtq123',
   port: '3306',
