@@ -30,7 +30,8 @@
   "scripts": {
     "test": "nodemon --exec babel-node -- src/test.js",
     "start": "nodemon src/app.js",
-    "nodemon:start": "lsof -i :4000 | grep node | grep -v grep | awk '{print $2}' | xargs kill -9&&nodemon --exec babel-node -- src/app.js"
+    "nodemon:start": "lsof -i :4000 | grep node | grep -v grep | awk '{print $2}' | xargs kill -9&&nodemon --exec babel-node -- src/app.js",
+    "babel:start": "babel-node ./src/app.js"
   },
   "repository": {
     "type": "git",
