@@ -2,11 +2,11 @@ import query from './mysql/index';
 
 const createEduBGs = (userId, secQuestions) => new Promise((resolve, reject) => {
   let sql = 'INSERT INTO `edu_background` (`user_id`, `school`, `major`, `degree`) VALUES '
-  sql += secQuestions.map(item => {
-    return '(' + userId + ', ' + item.school + ', ' + item.major + ', ' + item.degree + ')'
-  }).join(', ') + ';'
+  let allsql = secQuestions.map(item => {
+    return sql + `('` + userId + `', '` + item.school + `', '` + item.major + `', '` + item.degree.toUpperCase() + `')`
+  }).join(';')
   query({
-    sql,
+    sql: allsql,
     values: []
   })
   .then((res) => {

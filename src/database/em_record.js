@@ -2,11 +2,11 @@ import query from './mysql/index';
 
 const createEmRecords = (userId, secQuestions) => new Promise((resolve, reject) => {
   let sql = 'INSERT INTO `em_record` (`user_id`, `company`, `position`) VALUES '
-  sql += secQuestions.map(item => {
-    return '(' + userId + ', ' + item.company + ', ' + item.position + ')'
-  }).join(', ') + ';'
+  let allsql = secQuestions.map(item => {
+    return sql + '(' + userId + ', ' + item.company + ', ' + item.position + ')'
+  }).join(';')
   query({
-    sql,
+    sql: allsql,
     values: []
   })
   .then((res) => {

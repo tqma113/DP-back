@@ -121,11 +121,33 @@ const deleteUserIndustry= (user_id, industry_id) => new Promise((resolve, reject
   });
 });
 
+
+const deleteUserIndustrysByUserId = (user_id) => new Promise((resolve, reject) => {
+  query({
+    sql: 'DELETE FROM `user_industry` WHERE `user_id` = ?',
+    values: [user_id]
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
 export default {
   createUserIndustrys,
   selectUserIndustrysByUserId,
   selectUserIndustrysByIndustryId,
   deleteUserIndustry,
   selectUserIndustrysByUserIds,
-  selectUserIndustrysByIndustryIds
+  selectUserIndustrysByIndustryIds,
+  deleteUserIndustrysByUserId
 }

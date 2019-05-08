@@ -121,11 +121,32 @@ const deleteUserCategorys = (user_id, categoryId) => new Promise((resolve, rejec
   });
 });
 
+const deleteUserCategorysByUserId = (user_id) => new Promise((resolve, reject) => {
+  query({
+    sql: 'DELETE FROM `user_category` WHERE `user_id` = ?',
+    values: [user_id]
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
 export default {
   createUserCategorys,
   selectUserCategorysByUserId,
   selectUserCategorysByCategoryId,
   deleteUserCategorys,
   selectUserCategorysByUserIds,
-  selectUserCategorysByCategoryIds
+  selectUserCategorysByCategoryIds,
+  deleteUserCategorysByUserId
 }

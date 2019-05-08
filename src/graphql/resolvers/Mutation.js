@@ -1060,11 +1060,11 @@ export default {
         }
         if (eduBG && eduBG.length > 0) {
           await dataSources.database.eduBG.deleteEduBGsByUserId(user.id)
-          await dataSources.database.eduBG.createEduBGs(user.id, secQuestions)
+          await dataSources.database.eduBG.createEduBGs(user.id, eduBG)
         }
         if (emRecords && emRecords.length > 0) {
           await dataSources.database.emRecord.deleteEmRecordsByUserId(user.id)
-          await dataSources.database.emRecord.createEmRecords(user.id, secQuestions)
+          await dataSources.database.emRecord.createEmRecords(user.id, emRecords)
         }
         if (secQuestions && secQuestions.length > 0) {
           await dataSources.database.secQuestion.deleteUserSecQuestionByUserId(user.id)
