@@ -31,7 +31,8 @@
     "test": "nodemon --exec babel-node -- src/test.js",
     "start": "nodemon src/app.js",
     "nodemon:start": "lsof -i :4000 | grep node | grep -v grep | awk '{print $2}' | xargs kill -9&&nodemon --exec babel-node -- src/app.js",
-    "babel:start": "babel-node ./src/app.js"
+    "babel:start": "babel-node ./src/app.js",
+    "pm2:start": "pm2 start --watch ./index.js"
   },
   "repository": {
     "type": "git",
