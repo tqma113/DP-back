@@ -40,7 +40,7 @@ const corsOptions = {
 }
 
 const redisClear = './src/redis/clear.js'
-const PubSub = getPubSub()
+const pubsub = getPubSub()
 
 const queryAsync = async (i) => {
   i.industrys =  (await database.userIndustry.selectUserIndustrysByUserId(i.id)).map(item => item.industry_id)
@@ -72,16 +72,17 @@ const apollo = new ApolloServer({
               if (info) {
                 return database.user.selectUsersByUsernames([connectionParams.username])
                 .then(users => {
-                  let user = users[0]
-                  user = queryAsync(user)
-                  if (user.statue === 0) {
-                    database.user.updateUserById(users[0].id, 'status', 1)
-                    user.status = 1
+                  return queryAsync(users[0])
+                  .then((user) => {
+                    if (user.statue === 0) {
+                      database.user.updateUserById(user.id, 'status', 1)
+                      user.status = 1
+                    }
                     pubsub.publish(NEW_USER_LOGIN, user)
-                  }
-                  return ({
-                    currentUser: users[0],
-                    sessionInfo: info
+                    return ({
+                      currentUser: users[0],
+                      sessionInfo: info
+                    })
                   })
                 })
               }
