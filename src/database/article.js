@@ -90,14 +90,13 @@ const createArticle = (article) => new Promise((resolve, reject) => {
 
 const updateArticle = (article) => new Promise((resolve, reject) => {
   query({
-    sql: 'UPDATE `article` SET `title`=?, `abstract`=?, `content`=?, `user_id`=?, `image`=? WHERE `id`=?',
+    sql: 'UPDATE `article` SET `title`=?, `abstract`=?, `image`=?, `last_modify_time`=? WHERE `id`=?',
     values: [
       article.title,
       article.abstract,
-      article.content,
-      article.user_id,
       article.image,
-      article.id
+      new Date(),
+      article.id,
     ]
   })
   .then((res) => {

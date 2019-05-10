@@ -44,8 +44,8 @@ const writeWithStream = (stream, mimetype) => new Promise((resolve, reject) => {
   stream.on('error', reject)
 })
 
-const writeJSONSync = (buffer) => new Promise((resolve, reject) => {
-  let filename = getRandomFilenameWithSuffix('.json')
+const writeJSONSync = (buffer, fname) => new Promise((resolve, reject) => {
+  let filename = fname || getRandomFilenameWithSuffix('.json')
 
   fs.writeFile(path.resolve(JSON_LOAD_PATH, filename), buffer, { flag: "a" }, function (err) {
     if(err){
@@ -1415,12 +1415,11 @@ export default {
       let isValid = id && typeof id === 'number' && article && !!sessionInfo && currentUser && title && abstract && content && true
       if (isValid) {
         deleteJSON(article.content)
-        let contentName = await writeJSONSync(content)
+        writeJSONSync(content, article.content)
         let newArticle = {
           title,
           abstract,
           user_id: currentUser.id,
-          content: contentName,
           image,
           id
         }
