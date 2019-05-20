@@ -1,7 +1,7 @@
-import ScaleType from './ScaleType';
-import Query from './Query';
-import Mutation from './Mutation';
-import Subscription from './Subscription';
+import ScaleType from './Scale/index';
+import Query from './Query/index';
+import Mutation from './Mutation/index';
+import Subscription from './Subscription/index';
 
 const resolvers = {
   Query,

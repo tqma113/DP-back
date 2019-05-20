@@ -3,12 +3,12 @@ import fs from 'fs'
 import path from 'path'
 import getPubSub from './PubSub'
 
-import database from '../../database/index'
-
 import { NEW_MESSAGE, USER_LOGOUT, NEW_ARTICLE } from './events'
 
 const IMAGE_LOAD_PATH = __dirname + '/../../public/image'
 const JSON_LOAD_PATH = __dirname + '/../../public/JSON'
+
+const pubsub = getPubSub()
 
 const getRandomFilename = (mimetype) => {
   const all = 'qwertyuiopasdfghjklzxcvbnm-1234567890'
@@ -21,8 +21,6 @@ const getRandomFilename = (mimetype) => {
 
   return filename + suffix
 }
-
-const pubsub = getPubSub()
 
 const getRandomFilenameWithSuffix = (suffix) => {
   const all = 'qwertyuiopasdfghjklzxcvbnm-1234567890'
