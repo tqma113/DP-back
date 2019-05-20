@@ -4,6 +4,7 @@ type User {
   nickname: String!
   location: String
   gender: String!
+  user_type: Int
   birthday: Date
   industrys: [Int]!
   register_at: Date!

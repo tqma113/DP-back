@@ -17,6 +17,9 @@ import secQuestion from './sec_question'
 import userCategory from './user_category'
 import userIndustry from './user_industry'
 import userConcerned from './user_concerned'
+import applyAdmin from './apply_admin'
+import applyAddCategory from './apply_add_category'
+import applyAddIndustry from './apply_add.industry'
 
 export default {
   user,
@@ -37,5 +40,8 @@ export default {
   secQuestion,
   userCategory,
   userIndustry,
-  userConcerned
+  userConcerned,
+  applyAdmin,
+  applyAddCategory,
+  applyAddIndustry
 }

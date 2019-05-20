@@ -1533,4 +1533,833 @@ export default {
 
     return response
   },
+  applyAdmin: async (root, { reason }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let isValid = currentUser && sessionInfo && reason
+
+      if (isValid) {
+        await dataSources.database.applyAdmin.createApplyAdmins(currentUser.id, reason)
+
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'applyAdmin',
+            errors
+          }
+        }
+      } else {
+        if (!currentUser || !sessionInfo) {
+          errors.push({
+            path: 'applyAdmin',
+            message: 'auth fail'
+          })
+        }
+
+        if (!reason) {
+          errors.push({
+            path: 'applyAdmin',
+            message: 'reason is null'
+          })
+        }
+        
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'applyAdmin',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'applyAdmin',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "applyAdmin",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  applyAddCategory: async (root, { subject, description, image }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let isValid = currentUser && sessionInfo && subject && description
+
+      if (isValid) {
+        let category = {
+          subject,
+          description,
+          image
+        }
+        await dataSources.database.applyAddCategory.createApplyAddCategory(currentUser.id, category)
+        
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'applyAddCategory',
+            errors
+          }
+        }
+      } else {
+        if (!currentUser || !sessionInfo) {
+          errors.push({
+            path: 'applyAddCategory',
+            message: 'auth fail'
+          })
+        } else {
+          errors.push({
+            path: 'applyAddCategory',
+            message: 'category format fail'
+          })
+        }
+        
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'applyAddCategory',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'applyAddCategory',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "applyAddCategory",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  applyAddIndustry: async (root, { name, description, image }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let isValid = currentUser && sessionInfo && name && description
+
+      if (isValid) {
+        let category = {
+          name,
+          description,
+          image
+        }
+        await dataSources.database.applyAddIndustry.createApplyAddIndustry(currentUser.id, category)
+        
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'applyAddIndustry',
+            errors
+          }
+        }
+      } else {
+        if (!currentUser || !sessionInfo) {
+          errors.push({
+            path: 'applyAddIndustry',
+            message: 'auth fail'
+          })
+        } else {
+          errors.push({
+            path: 'applyAddIndustry',
+            message: 'category format fail'
+          })
+        }
+        
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'applyAddIndustry',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'applyAddIndustry',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "applyAddIndustry",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  changeApplyAdmin: async (root, { id, reason }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let applyAdmin
+      if (id && typeof id === 'number') {
+        applyAdmin = (await dataSources.database.applyAdmin.selectApplyAdminsById(id))[0]
+      }
+      let isValid = currentUser && sessionInfo && applyAdmin && reason && applyAdmin.user_id == currentUser.id
+
+      if (isValid) {
+        await dataSources.database.applyAdmin.updateApplyAdmins(id, 'reason',reason)
+
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'changeApplyAdmin',
+            errors
+          }
+        }
+      } else {
+        if (!currentUser || !sessionInfo) {
+          errors.push({
+            path: 'changeApplyAdmin',
+            message: 'auth fail'
+          })
+        }
+
+        if (!id) {
+          errors.push({
+            path: 'changeApplyAdmin',
+            message: 'id is null'
+          })
+        }
+
+        if (!reason) {
+          errors.push({
+            path: 'changeApplyAdmin',
+            message: 'reason is null'
+          })
+        }
+        
+        if (applyAdmin.user_id != currentUser.id) {
+          errors.push({
+            path: 'changeApplyAdmin',
+            message: 'you have no permission'
+          })
+        }
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'changeApplyAdmin',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'changeApplyAdmin',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "changeApplyAdmin",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  changeApplyAddCategory: async (root, { id, subject, description, image }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let applyAddCategory
+      if (id && typeof id === 'number') {
+        applyAddCategory = (await dataSources.database.applyAddCategory.selectApplyAddCategorysById(id))[0]
+      }
+      let isValid = currentUser && sessionInfo && applyAddCategory && reason && applyAddCategory.user_id == currentUser.id
+
+      if (isValid) {
+        if (subject) await dataSources.database.applyAddCategory.updateApplyAddCategory(id, 'subject', subject)
+        if (description) await dataSources.database.applyAddCategory.updateApplyAddCategory(id, 'description', description)
+        if (image) await dataSources.database.applyAddCategory.updateApplyAddCategory(id, 'image', image)
+
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'changeApplyAddCategory',
+            errors
+          }
+        }
+      } else {
+        if (!currentUser || !sessionInfo) {
+          errors.push({
+            path: 'changeApplyAddCategory',
+            message: 'auth fail'
+          })
+        }
+
+        if (!id) {
+          errors.push({
+            path: 'changeApplyAddCategory',
+            message: 'id is null'
+          })
+        }
+
+        if (!reason) {
+          errors.push({
+            path: 'changeApplyAddCategory',
+            message: 'reason is null'
+          })
+        }
+        
+        if (applyAddCategory.user_id != currentUser.id) {
+          errors.push({
+            path: 'changeApplyAddCategory',
+            message: 'you have no permission'
+          })
+        }
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'changeApplyAddCategory',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'changeApplyAddCategory',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "changeApplyAddCategory",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  changeApplyAddIndustry: async (root, { id, name, description, image }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let applyAddIndustry
+      if (id && typeof id === 'number') {
+        applyAddIndustry = (await dataSources.database.applyAddIndustry.selectApplyAddIndustryById(id))[0]
+      }
+      let isValid = currentUser && sessionInfo && applyAddIndustry && reason && applyAddIndustry.user_id == currentUser.id
+
+      if (isValid) {
+        if (name) await dataSources.database.applyAddIndustry.updateApplyAddIndustry(id, 'name', name)
+        if (description) await dataSources.database.applyAddIndustry.updateApplyAddIndustry(id, 'description', description)
+        if (image) await dataSources.database.applyAddIndustry.updateApplyAddIndustry(id, 'image', image)
+
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'changeApplyAddIndustry',
+            errors
+          }
+        }
+      } else {
+        if (!currentUser || !sessionInfo) {
+          errors.push({
+            path: 'changeApplyAddIndustry',
+            message: 'auth fail'
+          })
+        }
+
+        if (!id) {
+          errors.push({
+            path: 'changeApplyAddIndustry',
+            message: 'id is null'
+          })
+        }
+
+        if (!reason) {
+          errors.push({
+            path: 'changeApplyAddIndustry',
+            message: 'reason is null'
+          })
+        }
+        
+        if (applyAddIndustry.user_id != currentUser.id) {
+          errors.push({
+            path: 'changeApplyAddIndustry',
+            message: 'you have no permission'
+          })
+        }
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'changeApplyAddIndustry',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'changeApplyAddIndustry',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "changeApplyAddIndustry",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  dealApplyAdmin: async (root, { id, status }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let applyAdmin
+      if (id && typeof id === 'number') {
+        applyAdmin = (await dataSources.database.applyAdmin.selectApplyAdminsById(id))[0]
+      }
+      let isValid = currentUser && sessionInfo && applyAdmin && currentUser.user_type == 1
+
+      if (isValid) {
+        await dataSources.database.applyAdmin.updateApplyAdmins(id, 'deal_user_id', currentUser.id)
+        await dataSources.database.applyAdmin.updateApplyAdmins(id, 'deal_time', (new Date()).getTime())
+        await dataSources.database.applyAdmin.updateApplyAdmins(id, 'status', status)
+
+        if (status == '1') {
+          await dataSources.database.user.updateUserById(applyAdmin.user_id, 'user_type', 1)
+        }
+
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'dealApplyAdmin',
+            errors
+          }
+        }
+      } else {
+        if (!currentUser || !sessionInfo) {
+          errors.push({
+            path: 'dealApplyAdmin',
+            message: 'auth fail'
+          })
+        }
+
+        if (!status) {
+          errors.push({
+            path: 'dealApplyAdmin',
+            message: 'status is null'
+          })
+        }
+        
+        if (applyAdmin.user_id != currentUser.id) {
+          errors.push({
+            path: 'dealApplyAdmin',
+            message: 'you have no permission'
+          })
+        }
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'dealApplyAdmin',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'dealApplyAdmin',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "dealApplyAdmin",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  dealApplyAddCategory: async (root, { id, status }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let applyAddCategory
+      if (id && typeof id === 'number') {
+        applyAddCategory = (await dataSources.database.applyAddCategory.selectApplyAddCategorysById(id))[0]
+      }
+      let isValid = currentUser && sessionInfo && applyAddCategory && currentUser.user_type == '1'
+
+      if (isValid) {
+        await dataSources.database.applyAddCategory.updateApplyAddCategory(id, 'deal_user_id', currentUser.id)
+        await dataSources.database.applyAddCategory.updateApplyAddCategory(id, 'deal_time', (new Date()).getTime())
+        await dataSources.database.applyAddCategory.updateApplyAddCategory(id, 'status', status)
+
+        if (status == '1') {
+          await dataSources.database.category.createCategory([applyAddCategory])
+        }
+
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'dealApplyAddCategory',
+            errors
+          }
+        }
+      } else {
+        if (!currentUser || !sessionInfo) {
+          errors.push({
+            path: 'dealApplyAddCategory',
+            message: 'auth fail'
+          })
+        }
+
+        
+        if (currentUser.user_type != '1') {
+          errors.push({
+            path: 'dealApplyAddCategory',
+            message: 'you have no permission'
+          })
+        }
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'dealApplyAddCategory',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'dealApplyAddCategory',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "dealApplyAddCategory",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  dealApplyAddIndustry: async (root, { id, status }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let applyAddIndustry
+      if (id && typeof id === 'number') {
+        applyAddIndustry = (await dataSources.database.applyAddIndustry.selectApplyAddIndustryById(id))[0]
+      }
+      let isValid = currentUser && sessionInfo && applyAddIndustry && currentUser.user_type == '1'
+
+      if (isValid) {
+        await dataSources.database.applyAddIndustry.updateApplyAddCategory(id, 'deal_user_id', currentUser.id)
+        await dataSources.database.applyAddIndustry.updateApplyAddCategory(id, 'deal_time', (new Date()).getTime())
+        await dataSources.database.applyAddIndustry.updateApplyAddCategory(id, 'status', status)
+
+        if (status == '1') {
+          await dataSources.database.industry.createIndustrys([applyAddIndustry])
+        }
+
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'dealApplyAddIndustry',
+            errors
+          }
+        }
+      } else {
+        if (!currentUser || !sessionInfo) {
+          errors.push({
+            path: 'dealApplyAddIndustry',
+            message: 'auth fail'
+          })
+        }
+        
+        if (currentUser.user_type != '1') {
+          errors.push({
+            path: 'dealApplyAddIndustry',
+            message: 'you have no permission'
+          })
+        }
+        
+        if (applyAddCategory.user_id != currentUser.id) {
+          errors.push({
+            path: 'dealApplyAddIndustry',
+            message: 'you have no permission'
+          })
+        }
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'dealApplyAddIndustry',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'dealApplyAddIndustry',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "dealApplyAddIndustry",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  addAdmin: async (root, { id, status }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let user
+      if (id && typeof id === 'number') {
+        user = (await dataSources.database.user.selectUserById(id))[0]
+      }
+      let isValid = currentUser && sessionInfo && user && currentUser.user_type == 1
+
+      if (isValid) {
+        await dataSources.database.user.updateUserById(id, 'user_type', 1)
+
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'addAdmin',
+            errors
+          }
+        }
+      } else {
+        if (!currentUser || !sessionInfo) {
+          errors.push({
+            path: 'addAdmin',
+            message: 'auth fail'
+          })
+        }
+
+        if (!status) {
+          errors.push({
+            path: 'addAdmin',
+            message: 'status is null'
+          })
+        }
+        
+        if (applyAdmin.user_id != currentUser.id) {
+          errors.push({
+            path: 'addAdmin',
+            message: 'you have no permission'
+          })
+        }
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'addAdmin',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'addAdmin',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "addAdmin",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  addCategory: async (root, { subject, description, image }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let isValid = currentUser && sessionInfo && currentUser.user_type == '1'
+
+      if (isValid) {
+        let category = {
+          subject,
+          description,
+          image
+        }
+        await dataSources.database.category.createCategorys([category])
+
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'addCategory',
+            errors
+          }
+        }
+      } else {
+        if (!currentUser || !sessionInfo) {
+          errors.push({
+            path: 'addCategory',
+            message: 'auth fail'
+          })
+        }
+
+        
+        if (currentUser.user_type != '1') {
+          errors.push({
+            path: 'addCategory',
+            message: 'you have no permission'
+          })
+        }
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'addCategory',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'addCategory',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "addCategory",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
+  addIndustry: async (root, { name, description, image }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+    let response = {}
+    let errors = []
+
+    try {
+      let applyAddIndustry
+      if (id && typeof id === 'number') {
+        applyAddIndustry = (await dataSources.database.applyAddIndustry.selectApplyAddIndustryById(id))[0]
+      }
+      let isValid = currentUser && sessionInfo && applyAddIndustry && currentUser.user_type == '1'
+
+      if (isValid) {
+        let industry = {
+          name,
+          description,
+          image
+        }
+        await dataSources.database.industry.createIndustrys([industry])
+
+        response = {
+          isSuccess: true,
+          extension: {
+            operator: 'addIndustry',
+            errors
+          }
+        }
+      } else {
+        if (!currentUser || !sessionInfo) {
+          errors.push({
+            path: 'addIndustry',
+            message: 'auth fail'
+          })
+        }
+        
+        if (currentUser.user_type != '1') {
+          errors.push({
+            path: 'addIndustry',
+            message: 'you have no permission'
+          })
+        }
+        
+        if (applyAddCategory.user_id != currentUser.id) {
+          errors.push({
+            path: 'addIndustry',
+            message: 'you have no permission'
+          })
+        }
+
+        response = {
+          isSuccess: false,
+          extension: {
+            operator: 'addIndustry',
+            errors
+          }
+        }
+      }
+    } catch (err) {
+      console.log(err)
+      errors.push({
+        path: 'addIndustry',
+        message: JSON.stringify(err)
+      })
+      response = {
+        isSuccess: false,
+        extension: {
+          operator: "addIndustry",
+          errors
+        }
+      }
+    }
+
+    return response
+  },
 }

@@ -82,4 +82,28 @@ type Mutation {
     categoryIds: [Int]!,
     image: String!
   ): Response!
+  
+  applyAdmin(reason: String!): Response!
+  
+  applyAddCategory(subject: String!, description: String!, image: String): Response!
+  
+  applyAddIndustry(name: String!, description: String!, image: String): Response!
+
+  changeApplyAdmin(id: Int!, reason: String!): Response!
+
+  changeApplyAddCategory(id: Int!, subject: String!, description: String!, image: String): Response!
+  
+  changeApplyAddIndustry(id: Int!, name: String!, description: String!, image: String): Response!
+
+  dealApplyAdmin(id: Int!, status: Int!): Response!
+  
+  dealApplyAddCategory(id: Int!, status: Int!): Response!
+
+  dealApplyAddIndustry(id: Int!, status: Int!): Response!
+
+  addAdmin(id: Int!): Response!
+  
+  addCategory(subject: String!, description: String!, image: String): Response!
+  
+  addIndustry(name: String!, description: String!, image: String): Response!
 }

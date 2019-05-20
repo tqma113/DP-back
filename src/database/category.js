@@ -19,7 +19,24 @@ const selectCategory = () => new Promise((resolve, reject) => {
   });
 });
 
+const createCategorys = (categorys) => new Promise((resolve, reject) => {
+  let sql = 'INSERT INTO `category` (`subject`, `description`, `image`) VALUES '
+  sql += categorys.map(item => {
+    return '(' + item.subject + ', ' + item.description + ', ' + item.image + ')'
+  }).join(', ') + ';'
+  query({
+    sql,
+    values: []
+  })
+  .then((res) => {
+    resolve(res)
+  })
+  .catch((err) => {
+    reject(err)
+  });
+})
 
 export default {
-  selectCategory
+  selectCategory,
+  createCategorys
 }
