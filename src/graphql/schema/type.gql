@@ -120,6 +120,20 @@ type Comment {
   likes: [Like]
 }
 
+type Application {
+  id: Int
+  user_id: Int
+  apply_time: Date
+  deal_user_id: Int
+  deal_time: Date
+  status: Int
+  reason: String
+  subject: String
+  name: String
+  description: String
+  image: String
+}
+
 type Message {
   id: ID!
   sendUser: User
@@ -171,6 +185,8 @@ type Response {
 
   message: Message
   messages: [Message]
+
+  applications: [Application]
 
   isSuccess: Boolean!
   extension: Extension!

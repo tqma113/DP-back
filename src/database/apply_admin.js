@@ -3,7 +3,7 @@ import query from './mysql/index';
 const createApplyAdmins = (user_id, reasons) => new Promise((resolve, reject) => {
   let sql = 'INSERT INTO `apply_admin` (`user_id`, `reason`) VALUES '
   sql += reasons.map(item => {
-    return '(' + user_id + ', ' + item + ')'
+    return '(\'' + user_id + '\', \'' + item + '\')'
   }).join(', ') + ';'
   query({
     sql,

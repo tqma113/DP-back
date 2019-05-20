@@ -17,7 +17,7 @@ const applyAdmin = async (root, { reason }, { dataSources, res, req, currentUser
     let isValid = currentUser && sessionInfo && reason
 
     if (isValid) {
-      await dataSources.database.applyAdmin.createApplyAdmins(currentUser.id, reason)
+      await dataSources.database.applyAdmin.createApplyAdmins(currentUser.id, [reason])
 
       response = {
         isSuccess: true,
@@ -64,7 +64,7 @@ const applyAdmin = async (root, { reason }, { dataSources, res, req, currentUser
       }
     }
   }
-
+  
   return response
 }
 

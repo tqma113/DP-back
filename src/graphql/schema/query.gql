@@ -10,4 +10,10 @@ type Query {
   articles(idList: [Int], categoryIds: [Int]): Response!
 
   messages(userId: Int!): Response!
+
+  adminApply: Response!
+
+  categoryApply: Response!
+
+  industryApply: Response!
 }

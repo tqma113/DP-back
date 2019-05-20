@@ -106,4 +106,10 @@ type Mutation {
   addCategory(subject: String!, description: String!, image: String): Response!
   
   addIndustry(name: String!, description: String!, image: String): Response!
+
+  cancelApplyAdmin(id: Int!): Response
+
+  cancelApplyAddCategory(id: Int!): Response!
+
+  cancelApplyAddIndustry(id: Int!): Response!
 }

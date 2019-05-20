@@ -9,46 +9,55 @@ import { getRandomFilename, getRandomFilenameWithSuffix, writeWithStream, writeJ
 
 const pubsub = getPubSub()
 
-const applyAddIndustry = async (root, { name, description, image }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+const cancelApplyAdmin = async (root, { id, status }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
   let response = {}
   let errors = []
 
   try {
-    let isValid = currentUser && sessionInfo && name && description
+    let applyAdmin
+    if (id && typeof id === 'number') {
+      applyAdmin = (await dataSources.database.applyAdmin.selectApplyAdminsById(id))[0]
+    }
+    let isValid = currentUser && sessionInfo && applyAdmin && applyAdmin.status == '1'
 
     if (isValid) {
-      let industry = {
-        name,
-        description,
-        image
+      if (applyAdmin.status == '1') {
+        await dataSources.database.applyAdmin.updateApplyAdmins(id, 'status', -1)
       }
-      await dataSources.database.applyAddIndustry.createApplyAddIndustry(currentUser.id, [industry])
-      
+
       response = {
         isSuccess: true,
         extension: {
-          operator: 'applyAddIndustry',
+          operator: 'dealApplyAdmin',
           errors
         }
       }
     } else {
       if (!currentUser || !sessionInfo) {
         errors.push({
-          path: 'applyAddIndustry',
+          path: 'dealApplyAdmin',
           message: 'auth fail'
         })
-      } else {
+      }
+
+      if (!status) {
         errors.push({
-          path: 'applyAddIndustry',
-          message: 'category format fail'
+          path: 'dealApplyAdmin',
+          message: 'status is null'
         })
       }
       
+      if (applyAdmin.status == '1') {
+        errors.push({
+          path: 'dealApplyAdmin',
+          message: 'you have no permission'
+        })
+      }
 
       response = {
         isSuccess: false,
         extension: {
-          operator: 'applyAddIndustry',
+          operator: 'dealApplyAdmin',
           errors
         }
       }
@@ -56,13 +65,13 @@ const applyAddIndustry = async (root, { name, description, image }, { dataSource
   } catch (err) {
     console.log(err)
     errors.push({
-      path: 'applyAddIndustry',
+      path: 'dealApplyAdmin',
       message: JSON.stringify(err)
     })
     response = {
       isSuccess: false,
       extension: {
-        operator: "applyAddIndustry",
+        operator: "dealApplyAdmin",
         errors
       }
     }
@@ -71,4 +80,4 @@ const applyAddIndustry = async (root, { name, description, image }, { dataSource
   return response
 }
 
-export default applyAddIndustry
+export default cancelApplyAdmin

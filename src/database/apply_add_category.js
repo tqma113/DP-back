@@ -3,7 +3,7 @@ import query from './mysql/index';
 const createAdminAddCategorys = (user_id, categorys) => new Promise((resolve, reject) => {
   let sql = 'INSERT INTO `apply_add_category` (`user_id`, `subject`, `description`, `image`) VALUES '
   sql += categorys.map(item => {
-    return '(' + user_id + ', ' + item.subject + ', ' + item.description + ', ' + item.image + ')'
+    return '(\'' + user_id + '\', \'' + item.subject + '\', \'' + item.description + '\', \'' + item.image + '\')'
   }).join(', ') + ';'
   query({
     sql,

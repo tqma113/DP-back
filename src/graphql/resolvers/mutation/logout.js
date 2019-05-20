@@ -12,7 +12,10 @@ const pubsub = getPubSub()
 const logout = async (root, { },  { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
   let response = {}
   let errors = []
-  if (sessionInfo && currentUser) {
+
+  let isValid = sessionInfo && currentUser
+  console.log(sessionInfo, currentUser)
+  if (isValid) {
     dataSources.jwt.stale(currentUser.username)
     currentUser.status = 0
     pubsub.publish(USER_LOGOUT, currentUser)

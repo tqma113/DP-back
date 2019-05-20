@@ -9,46 +9,47 @@ import { getRandomFilename, getRandomFilenameWithSuffix, writeWithStream, writeJ
 
 const pubsub = getPubSub()
 
-const applyAddIndustry = async (root, { name, description, image }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+const cancelApplyAddCategory = async (root, { id }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
   let response = {}
   let errors = []
 
   try {
-    let isValid = currentUser && sessionInfo && name && description
+    let applyAddCategory
+    if (id && typeof id === 'number') {
+      applyAddCategory = (await dataSources.database.applyAddCategory.selectApplyAddCategorysById(id))[0]
+    }
+    let isValid = currentUser && sessionInfo && applyAddCategory && applyAddCategory.status == 1
 
     if (isValid) {
-      let industry = {
-        name,
-        description,
-        image
-      }
-      await dataSources.database.applyAddIndustry.createApplyAddIndustry(currentUser.id, [industry])
-      
+      await dataSources.database.applyAddCategory.updateApplyAddCategory(id, 'status', -1)
+
       response = {
         isSuccess: true,
         extension: {
-          operator: 'applyAddIndustry',
+          operator: 'cancelApplyAddCategory',
           errors
         }
       }
     } else {
       if (!currentUser || !sessionInfo) {
         errors.push({
-          path: 'applyAddIndustry',
+          path: 'cancelApplyAddCategory',
           message: 'auth fail'
         })
-      } else {
+      }
+
+      
+      if (applyAddCategory.status == 1) {
         errors.push({
-          path: 'applyAddIndustry',
-          message: 'category format fail'
+          path: 'cancelApplyAddCategory',
+          message: 'you have no permission'
         })
       }
-      
 
       response = {
         isSuccess: false,
         extension: {
-          operator: 'applyAddIndustry',
+          operator: 'cancelApplyAddCategory',
           errors
         }
       }
@@ -56,13 +57,13 @@ const applyAddIndustry = async (root, { name, description, image }, { dataSource
   } catch (err) {
     console.log(err)
     errors.push({
-      path: 'applyAddIndustry',
+      path: 'cancelApplyAddCategory',
       message: JSON.stringify(err)
     })
     response = {
       isSuccess: false,
       extension: {
-        operator: "applyAddIndustry",
+        operator: "cancelApplyAddCategory",
         errors
       }
     }
@@ -71,4 +72,4 @@ const applyAddIndustry = async (root, { name, description, image }, { dataSource
   return response
 }
 
-export default applyAddIndustry
+export default cancelApplyAddCategory

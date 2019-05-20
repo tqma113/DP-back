@@ -22,11 +22,11 @@ const dealApplyAddCategory = async (root, { id, status }, { dataSources, res, re
 
     if (isValid) {
       await dataSources.database.applyAddCategory.updateApplyAddCategory(id, 'deal_user_id', currentUser.id)
-      await dataSources.database.applyAddCategory.updateApplyAddCategory(id, 'deal_time', (new Date()).getTime())
+      await dataSources.database.applyAddCategory.updateApplyAddCategory(id, 'deal_time', new Date())
       await dataSources.database.applyAddCategory.updateApplyAddCategory(id, 'status', status)
 
       if (status == '1') {
-        await dataSources.database.category.createCategory([applyAddCategory])
+        await dataSources.database.category.createCategorys([applyAddCategory])
       }
 
       response = {

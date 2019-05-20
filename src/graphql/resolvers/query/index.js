@@ -4,6 +4,9 @@ import categorys from './categorys'
 import industrys from './industrys'
 import articles from './articles'
 import messages from './messages'
+import adminApply from './adminApply'
+import categoryApply from './categoryApply'
+import industryApply from './industryApply'
 
 export default {
   init,
@@ -12,4 +15,7 @@ export default {
   industrys,
   articles,
   messages,
+  adminApply,
+  categoryApply,
+  industryApply,
 }

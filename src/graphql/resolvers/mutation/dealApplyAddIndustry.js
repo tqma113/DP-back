@@ -21,9 +21,9 @@ const dealApplyAddIndustry = async (root, { id, status }, { dataSources, res, re
     let isValid = currentUser && sessionInfo && applyAddIndustry && currentUser.user_type == '1'
 
     if (isValid) {
-      await dataSources.database.applyAddIndustry.updateApplyAddCategory(id, 'deal_user_id', currentUser.id)
-      await dataSources.database.applyAddIndustry.updateApplyAddCategory(id, 'deal_time', (new Date()).getTime())
-      await dataSources.database.applyAddIndustry.updateApplyAddCategory(id, 'status', status)
+      await dataSources.database.applyAddIndustry.updateApplyAddIndustry(id, 'deal_user_id', currentUser.id)
+      await dataSources.database.applyAddIndustry.updateApplyAddIndustry(id, 'deal_time', new Date())
+      await dataSources.database.applyAddIndustry.updateApplyAddIndustry(id, 'status', status)
 
       if (status == '1') {
         await dataSources.database.industry.createIndustrys([applyAddIndustry])

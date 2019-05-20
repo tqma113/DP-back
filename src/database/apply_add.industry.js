@@ -3,7 +3,7 @@ import query from './mysql/index';
 const createApplyAddIndustry = (user_id, industrys) => new Promise((resolve, reject) => {
   let sql = 'INSERT INTO `apply_add_industry` (`user_id`, `name`, `description`, `image`) VALUES '
   sql += industrys.map(item => {
-    return '(' + user_id + ', ' + item.name + ', ' + item.description + ', ' + item.image + ')'
+    return '(\'' + user_id + '\', \'' + item.name + '\', \'' + item.description + '\', \'' + item.image + '\')'
   }).join(', ') + ';'
   query({
     sql,

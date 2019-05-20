@@ -9,51 +9,45 @@ import { getRandomFilename, getRandomFilenameWithSuffix, writeWithStream, writeJ
 
 const pubsub = getPubSub()
 
-const dealApplyAdmin = async (root, { id, status }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+const cancelApplyAddIndustry = async (root, { id, status }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
   let response = {}
   let errors = []
 
   try {
-    let applyAdmin
+    let applyAddIndustry
     if (id && typeof id === 'number') {
-      applyAdmin = (await dataSources.database.applyAdmin.selectApplyAdminsById(id))[0]
+      applyAddIndustry = (await dataSources.database.applyAddIndustry.selectApplyAddIndustryById(id))[0]
     }
-    let isValid = currentUser && sessionInfo && applyAdmin && currentUser.user_type == 1
+    let isValid = currentUser && sessionInfo && applyAddIndustry && applyAddIndustry.status == 1
 
     if (isValid) {
-      await dataSources.database.applyAdmin.updateApplyAdmin(id, 'deal_user_id', currentUser.id)
-      await dataSources.database.applyAdmin.updateApplyAdmin(id, 'deal_time', new Date())
-      await dataSources.database.applyAdmin.updateApplyAdmin(id, 'status', status)
-
-      if (status == '1') {
-        await dataSources.database.user.updateUserById(applyAdmin.user_id, 'user_type', 1)
-      }
+      await dataSources.database.applyAddIndustry.updateApplyAddCategory(id, 'status', -1)
 
       response = {
         isSuccess: true,
         extension: {
-          operator: 'dealApplyAdmin',
+          operator: 'cancelApplyAddIndustry',
           errors
         }
       }
     } else {
       if (!currentUser || !sessionInfo) {
         errors.push({
-          path: 'dealApplyAdmin',
+          path: 'cancelApplyAddIndustry',
           message: 'auth fail'
         })
       }
-
-      if (!status) {
+      
+      if (applyAddIndustry.status == 1) {
         errors.push({
-          path: 'dealApplyAdmin',
-          message: 'status is null'
+          path: 'cancelApplyAddIndustry',
+          message: 'you have no permission'
         })
       }
       
-      if (applyAdmin.user_id != currentUser.id) {
+      if (applyAddCategory.user_id != currentUser.id) {
         errors.push({
-          path: 'dealApplyAdmin',
+          path: 'cancelApplyAddIndustry',
           message: 'you have no permission'
         })
       }
@@ -61,7 +55,7 @@ const dealApplyAdmin = async (root, { id, status }, { dataSources, res, req, cur
       response = {
         isSuccess: false,
         extension: {
-          operator: 'dealApplyAdmin',
+          operator: 'cancelApplyAddIndustry',
           errors
         }
       }
@@ -69,13 +63,13 @@ const dealApplyAdmin = async (root, { id, status }, { dataSources, res, req, cur
   } catch (err) {
     console.log(err)
     errors.push({
-      path: 'dealApplyAdmin',
+      path: 'cancelApplyAddIndustry',
       message: JSON.stringify(err)
     })
     response = {
       isSuccess: false,
       extension: {
-        operator: "dealApplyAdmin",
+        operator: "cancelApplyAddIndustry",
         errors
       }
     }
@@ -84,4 +78,4 @@ const dealApplyAdmin = async (root, { id, status }, { dataSources, res, req, cur
   return response
 }
 
-export default dealApplyAdmin
+export default cancelApplyAddIndustry

@@ -22,7 +22,7 @@ const applyAddCategory = async (root, { subject, description, image }, { dataSou
         description,
         image
       }
-      await dataSources.database.applyAddCategory.createApplyAddCategory(currentUser.id, category)
+      await dataSources.database.applyAddCategory.createAdminAddCategorys(currentUser.id, [category])
       
       response = {
         isSuccess: true,
