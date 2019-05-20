@@ -76,3 +76,5 @@ const login = async (root, { username, password }, { dataSources, res, req, curr
   
   return response
 }
+
+export default login
