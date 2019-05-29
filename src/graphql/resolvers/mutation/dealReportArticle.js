@@ -17,6 +17,7 @@ const dealReportArticle = async (root, { id, status },  { dataSources, res, req,
     let isValid = currentUser && sessionInfo && currentUser.user_type == 1
     if (isValid) {
       let report = (await dataSources.database.articleReport.selectArticleReportsById(id))[0]
+      console.log(report)
       if (report && report.status == 0) {
         await dataSources.database.articleReport.updateArticleReportsStatus(id, Number(status))
         response = {
@@ -55,6 +56,7 @@ const dealReportArticle = async (root, { id, status },  { dataSources, res, req,
       }
     }
   } catch (err) {
+    console.log(err)
     errors.push({
       path: 'dealReportArticle',
       message: JSON.stringify(err)

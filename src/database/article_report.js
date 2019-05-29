@@ -181,6 +181,26 @@ const updateArticleReportsStatus = (id, status) => new Promise((resolve, reject)
   });
 });
 
+const selectArticleReportsById = (id) => new Promise((resolve, reject) => {
+  query({
+    sql: 'SELECT * FROM `article_report` WHERE `id` = ?',
+    values: [id]
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
 export default {
   createArticleReports,
   selectArticleReportsByUserId,
@@ -190,5 +210,6 @@ export default {
   selectArticleReportsByArticleId,
   deleteArticleReportsByUserId,
   updateArticleReportsStatus,
-  selectArticleReports
+  selectArticleReports,
+  selectArticleReportsById
 }

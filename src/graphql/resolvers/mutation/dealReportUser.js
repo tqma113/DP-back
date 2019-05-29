@@ -55,6 +55,7 @@ const dealReportUser = async (root, { id, status },  { dataSources, res, req, cu
       }
     }
   } catch (err) {
+    console.log(err)
     errors.push({
       path: 'dealReportUser',
       message: JSON.stringify(err)

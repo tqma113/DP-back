@@ -174,9 +174,13 @@ type Report {
   id: Int!
   reason: String
   user_id: Int
+  user: User
   article_id: Int
   report_time: Date
   report_user_id: Int
+  reportUser: User
+  article: Article
+  status: Int
 }
 
 type Response {

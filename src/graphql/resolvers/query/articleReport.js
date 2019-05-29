@@ -9,6 +9,11 @@ const articleReport = async (root, { userId }, { dataSources, res, req, currentU
 
     if (isValid) {
       let reports = await dataSources.database.articleReport.selectArticleReports()
+      reports = reports.map(async item => {
+        item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
+        item.article = (await dataSources.database.article.selectArticlesByIds([item.article_id]))[0]
+        return item
+      })
       response = {
         reports,
         isSuccess: true,
