@@ -33,6 +33,10 @@ import dealApplyAddIndustry from './dealApplyAddIndustry'
 import addAdmin from './addAdmin'
 import addCategory from './addCategory'
 import addIndustry from './addIndustry'
+import reportUser from './reportUser'
+import reportArticle from './reportArticle'
+import dealReportUser from './dealReportUser'
+import dealReportArticle from './dealReportArticle'
 
 
 export default {
@@ -71,4 +75,8 @@ export default {
   addAdmin,
   addCategory,
   addIndustry,
+  reportUser,
+  reportArticle,
+  dealReportUser,
+  dealReportArticle
 }

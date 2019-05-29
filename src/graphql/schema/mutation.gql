@@ -114,4 +114,12 @@ type Mutation {
   cancelApplyAddCategory(id: Int!): Response!
 
   cancelApplyAddIndustry(id: Int!): Response!
+
+  reportUser(userId: Int!, reason: String!): Response!
+
+  reportArticle(articleId: Int!, reason: String): Response!
+
+  dealReportUser(id: Int!, status: Int!): Response!
+
+  dealReportArticle(id: Int!, status: Int!): Response
 }
