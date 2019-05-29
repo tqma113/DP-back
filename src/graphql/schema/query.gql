@@ -16,4 +16,8 @@ type Query {
   categoryApply: Response!
 
   industryApply: Response!
+
+  userReport: Response!
+
+  articleReport: Response!
 }

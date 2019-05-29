@@ -3,7 +3,7 @@ import query from './mysql/index';
 const createUserReports = (userId, reports) => new Promise((resolve, reject) => {
   let sql = 'INSERT INTO `user_report` (`user_id`, `report_user_id`, `reason`) VALUES '
   sql += reports.map(item => {
-    return '(' + userId + ', ' + item.userId + ', ' + item.reason + ')'
+    return '(\'' + userId + '\', \'' + item.userId + '\', \'' + item.reason + '\')'
   }).join(', ') + ';'
   query({
     sql,
@@ -41,6 +41,26 @@ const selectUserReportsById = (id) => new Promise((resolve, reject) => {
   query({
     sql: 'SELECT * FROM `user_report` WHERE `id` = ?',
     values: [id]
+  })
+  .then((res) => {
+    if(res) {
+      resolve(res)
+    } else {
+      reject({
+        success: false,
+        err: 'query result is empty'
+      })
+    }
+  })
+  .catch((err) => {
+    reject(err)
+  });
+});
+
+const selectUserReports = () => new Promise((resolve, reject) => {
+  query({
+    sql: 'SELECT * FROM `user_report`',
+    values: []
   })
   .then((res) => {
     if(res) {
@@ -190,5 +210,6 @@ export default {
   selectUserReportsByReportedUserIds,
   deleteUserReportsByUserId,
   selectUserReportsById,
-  updateUserReportsStatus
+  updateUserReportsStatus,
+  selectUserReports
 }

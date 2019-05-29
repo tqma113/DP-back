@@ -43,6 +43,7 @@ const reportUser = async (root, { userId, reason },  { dataSources, res, req, cu
       }
     }
   } catch (err) {
+    console.log(err)
     errors.push({
       path: 'reportUser',
       message: JSON.stringify(err)

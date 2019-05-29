@@ -11,6 +11,7 @@ type User {
   last_login_at: Date!
   avatar: String
   status: Int
+  usable: Int
   statement: String
   email: String!
   eduBG: [EduBG]!
@@ -106,6 +107,7 @@ type Article {
   comments: [Comment]
   likes: [Like]
   collections: [Collect]
+  status: Int
 }
 
 type Comment {
@@ -168,6 +170,15 @@ type Extension {
   errors: [Error]!
 }
 
+type Report {
+  id: Int!
+  reason: String
+  user_id: Int
+  article_id: Int
+  report_time: Date
+  report_user_id: Int
+}
+
 type Response {
   key: String
   token: String
@@ -188,6 +199,8 @@ type Response {
   messages: [Message]
 
   applications: [Application]
+
+  reports: [Report]
 
   isSuccess: Boolean!
   extension: Extension!

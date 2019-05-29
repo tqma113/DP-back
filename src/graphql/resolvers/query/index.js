@@ -7,6 +7,8 @@ import messages from './messages'
 import adminApply from './adminApply'
 import categoryApply from './categoryApply'
 import industryApply from './industryApply'
+import userReport from './userReport'
+import articleReport from './articleReport'
 
 export default {
   init,
@@ -18,4 +20,6 @@ export default {
   adminApply,
   categoryApply,
   industryApply,
+  userReport,
+  articleReport
 }
