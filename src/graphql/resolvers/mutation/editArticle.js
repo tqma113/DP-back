@@ -9,7 +9,7 @@ import { getRandomFilename, getRandomFilenameWithSuffix, writeWithStream, writeJ
 
 const pubsub = getPubSub()
 
-const editArticle = async (root, { id, title, abstract, content, categoryIds, image }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+const editArticle = async (root, { id, title, abstract, content, categoryIds, industryIds, image }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
   let response = {}
   let errors = []
 
@@ -31,11 +31,16 @@ const editArticle = async (root, { id, title, abstract, content, categoryIds, im
       }
 
       newArticle = await dataSources.database.article.updateArticle(newArticle)
-
       if (newArticle) {
+        let preCategorys = dataSources.database.articleCategory.selectArticleCategorysByArticleId(id)
+        let preIndustrys = dataSources.database.articleIndustry.selectArticleIndustrysByArticleId(id)
         await dataSources.database.articleCategory.deleteArticleCategorysByArticleId(id)
+        await dataSources.database.articleIndustry.deleteArticleIndustrysByArticleId(id)
         let categorys = await dataSources.database.articleCategory.createArticleCategorys(id, categoryIds)
-        if (categorys.affectedRows=== categoryIds.length) {
+        let industrys = await dataSources.database.articleIndustry.createArticleIndustrys(id, industryIds)
+        if (categorys.affectedRows === categoryIds.length && industrys.affectedRows=== industryIds.length) {
+          newArticle.industrys = industryIds
+          newArticle.categorys = categoryIds
           response = {
             article: newArticle,
             isSuccess: true,
@@ -45,7 +50,10 @@ const editArticle = async (root, { id, title, abstract, content, categoryIds, im
             }
           }
         } else {
-          dataSources.database.article.deleteArticleById(newArticle.id)
+          await dataSources.database.articleCategory.deleteArticleCategorysByArticleId(id)
+          await dataSources.database.articleIndustry.deleteArticleIndustrysByArticleId(id)
+          await dataSources.database.articleCategory.createArticleCategorys(id, preCategorys)
+          await dataSources.database.articleIndustry.createArticleIndustrys(id, preIndustrys)
           errors.push({
             path: 'editArticle',
             message: 'article category setfail'

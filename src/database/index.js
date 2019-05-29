@@ -20,6 +20,7 @@ import userConcerned from './user_concerned'
 import applyAdmin from './apply_admin'
 import applyAddCategory from './apply_add_category'
 import applyAddIndustry from './apply_add.industry'
+import articleIndustry from './article_industry'
 
 export default {
   user,
@@ -43,5 +44,6 @@ export default {
   userConcerned,
   applyAdmin,
   applyAddCategory,
-  applyAddIndustry
+  applyAddIndustry,
+  articleIndustry
 }

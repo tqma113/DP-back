@@ -9,7 +9,7 @@ import { getRandomFilename, getRandomFilenameWithSuffix, writeWithStream, writeJ
 
 const pubsub = getPubSub()
 
-const createArticle = async (root, { title, abstract, content, categoryIds, image }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
+const createArticle = async (root, { title, abstract, content, categoryIds, industryIds, image }, { dataSources, res, req, currentUser, sessionInfo, errors: authErrors }, info) => {
   let response = {}
   let errors = []
 
@@ -29,9 +29,10 @@ const createArticle = async (root, { title, abstract, content, categoryIds, imag
       let newArticle = await dataSources.database.article.createArticle(article)
 
       if (newArticle) {
-
         let categorys = await dataSources.database.articleCategory.createArticleCategorys(newArticle.id, categoryIds)
-        if (categorys.affectedRows=== categoryIds.length) {
+        let industrys = await dataSources.database.articleIndustry.createArticleIndustrys(newArticle.id, industryIds)
+        if (industrys.affectedRows=== industryIds.length && categorys.affectedRows=== categoryIds.length) {
+          newArticle.industrys = industryIds
           newArticle.categorys = categoryIds
           pubsub.publish(NEW_ARTICLE, newArticle)
           response = {
@@ -43,7 +44,9 @@ const createArticle = async (root, { title, abstract, content, categoryIds, imag
             }
           }
         } else {
-          dataSources.database.article.deleteArticleById(newArticle.id)
+          await dataSources.database.articleIndustry.deleteArticleIndustrysByArticleId(newArticle.id)
+          await dataSources.database.articleCategory.deleteArticleCategorysByArticleId(newArticle.id)
+          await dataSources.database.article.deleteArticleById(newArticle.id)
           errors.push({
             path: 'createArticle',
             message: 'article category setfail'

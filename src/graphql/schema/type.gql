@@ -102,6 +102,7 @@ type Article {
   user: User
   project_link: [String]
   categorys: [Int]!
+  industrys: [Int]!
   comments: [Comment]
   likes: [Like]
   collections: [Collect]

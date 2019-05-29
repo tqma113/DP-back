@@ -18,9 +18,11 @@ const newArticle = {
       payload.id &&
       payload.user_id &&
       payload.categorys &&
+      payload.industrys &&
       (
         currentUser.concerned.some(item => Number(item.concerned_user_id) === Number(payload.user_id)) ||
-        currentUser.categorys.some(item => payload.categorys.some(i => Number(i) === Number(item)))
+        currentUser.categorys.some(item => payload.categorys.some(i => Number(i) === Number(item))) ||
+        currentUser.industrys.some(item => payload.industrys.some(i => Number(i) === Number(item)))
       )
     },
   )

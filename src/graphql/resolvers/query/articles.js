@@ -41,6 +41,7 @@ const articles = async (root, { idList, categoryIds }, { dataSources, res, req, 
       item.content = JSON.parse(await readJSONAsync(item.content))
       item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
       item.categorys = (await dataSources.database.articleCategory.selectArticleCategorysByArticleId(item.id)).map(item => item.category_id)
+      item.industrys = (await dataSources.database.articleIndustry.selectArticleIndustrysByArticleId(item.id)).map(item => item.industry_id)
       item.collections = (await dataSources.database.articleCollection.selectArticleCollectionsByArticleId(item.id)).map(async item => {
         item.user = (await dataSources.database.user.selectUserById(item.user_id))[0]
         return item

@@ -37,6 +37,7 @@ type Mutation {
     abstract: String!,
     content: String!,
     categoryIds: [Int]!,
+    industryIds: [Int]!,
     image: String!
   ): Response!
 
@@ -80,6 +81,7 @@ type Mutation {
     abstract: String!,
     content: String!,
     categoryIds: [Int]!,
+    industryIds: [Int]!,
     image: String!
   ): Response!
   
