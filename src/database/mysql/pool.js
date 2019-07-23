@@ -3,7 +3,7 @@ import mysql from 'mysql';
 const configurations = {
   // Note: You may need sudo to run on port 443
   production: 'localhost',
-  development: 'www.matianqi.com'
+  development: '47.90.81.55'
 }
 
 const environment = process.env.NODE_ENV || 'production'

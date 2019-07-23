@@ -13,7 +13,7 @@ export const readJSONAsync = (filename) => new Promise((resolve, reject) => {
 })
 
 export const getRandomFilename = (mimetype) => {
-  const all = 'qwertyuiopasdfghjklzxcvbnm-1234567890'
+  const all = 'qwertyuiopasdfghjklzxcvbnm_1234567890'
   let filename = ''
   let suffix = '.' + mimetype.split('/')[1]
 
@@ -25,7 +25,7 @@ export const getRandomFilename = (mimetype) => {
 }
 
 export const getRandomFilenameWithSuffix = (suffix) => {
-  const all = 'qwertyuiopasdfghjklzxcvbnm-1234567890'
+  const all = 'qwertyuiopasdfghjklzxcvbnm_1234567890'
   let filename = ''
 
   for(let i = 0;i < 36;i++) {
