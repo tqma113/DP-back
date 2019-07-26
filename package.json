@@ -1,53 +1,41 @@
 {
-  "name": "dp-back",
+  "name": "DP-back",
   "version": "1.0.0",
   "description": "Diploma project of myself. The back-end of web project.",
   "main": "index.js",
-  "dependencies": {
-    "apollo-server": "^2.4.8",
-    "apollo-server-express": "^2.4.8",
-    "apollo-upload-server": "^7.1.0",
-    "cors": "^2.8.5",
-    "express": "^4.16.4",
-    "express-jwt": "^5.3.1",
-    "graphql": "^14.1.1",
-    "graphql-type-json": "^0.3.0",
-    "jsonwebtoken": "^8.5.1",
-    "merge-graphql-schemas": "^1.5.8",
-    "moment": "^2.24.0",
-    "morgan": "^1.9.1",
-    "multer": "^1.4.1",
-    "mysql": "^2.16.0",
-    "nodemailer": "^5.1.1",
-    "redis": "^2.8.0",
-    "rotating-file-stream": "^1.4.0"
-  },
-  "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-core": "^6.26.3",
-    "babel-preset-env": "^1.7.0"
-  },
   "scripts": {
-    "test": "nodemon --exec babel-node -- src/test.js",
-    "start": "nodemon src/app.js",
-    "nodemon:start": "lsof -i :4000 | grep node | grep -v grep | awk '{print $2}' | xargs kill -9&&nodemon --exec babel-node -- src/app.js",
-    "babel:start": "babel-node ./src/app.js",
-    "pm2:start": "pm2 start --watch ./src/index.js"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon --watch src -e ts,tsx --exec ts-node src/index.ts",
+    "build-ts": "tsc",
+    "copy-static-assets": "ts-node copyStaticAssets.ts",
+    "tslint": "tslint -c tslint.json -p tsconfig.json",
+    "serve": "node dist/server.js",
+    "build": "npm run tslint && npm run build-ts && npm run copy-static-assets",
+    "start": "npm run serve",
+    "heroku-postbuild": "npm run build"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Monsooon/DP-back.git"
   },
-  "keywords": [
-    "blog",
-    "web",
-    "nodejs",
-    "graphql"
-  ],
-  "author": "Ma Tianqi",
-  "license": "MIT",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/Monsooon/DP-back/issues"
   },
-  "homepage": "https://github.com/Monsooon/DP-back#readme"
+  "homepage": "https://github.com/Monsooon/DP-back#readme",
+  "devDependencies": {
+    "@types/node": "^12.6.8",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "@types/koa": "^2.0.49",
+    "@types/koa-bodyparser": "^4.3.0",
+    "@types/koa-json": "^2.0.18",
+    "@types/koa-logger": "^3.1.1",
+    "@types/koa-router": "^7.0.42",
+    "@types/node-fetch": "^2.5.0",
+    "ts-node": "^8.3.0"
+  }
 }

@@ -1,9 +1,0 @@
-type Subscription {
-  newMessage: Message!
-
-  newUserLogin: User!
-
-  userLogout: User!
-
-  newArticle: Article!
-}

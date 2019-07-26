@@ -1,9 +1,0 @@
-{
-  "presets": ["env"],
-  "ignore": [
-    "node_modules",
-    "foo",
-    "bar",
-    "baz"
-  ]
-}
