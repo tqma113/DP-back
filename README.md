@@ -1,10 +1,53 @@
-# DP-back
-Diploma project of myself. The back-end of web project.
+# Welcome to dp-back 👋
+![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000)
+[![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](https://github.com/Monsooon/DP-back#readme)
+[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/Monsooon/DP-back/graphs/commit-activity)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Monsooon/DP-back/blob/master/LICENSE)
 
-nodemailer 实现邮箱验证
+> Diploma project of myself. The back-end of web project.
 
-mysql 部署
+### 🏠 [Homepage](https://github.com/Monsooon/DP-back#readme)
 
-redis 部署
+## Install
 
-缓存方案: dataloader/apollo-server-cache-memcached  (可选)
+```sh
+npm install
+```
+
+## Usage
+
+```sh
+npm run start
+```
+
+## Run tests
+
+```sh
+npm run test
+```
+
+## Author
+
+👤 **Ma Tianqi**
+
+* Github: [@Monsooon](https://github.com/Monsooon)
+
+## 🤝 Contributing
+
+Contributions, issues and feature requests are welcome!
+
+Feel free to check [issues page](https://github.com/Monsooon/DP-back/issues).
+
+## Show your support
+
+Give a ⭐️ if this project helped you!
+
+
+## 📝 License
+
+Copyright © 2019 [Ma Tianqi](https://github.com/Monsooon).
+
+This project is [MIT](https://github.com/Monsooon/DP-back/blob/master/LICENSE) licensed.
+
+***
+_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
