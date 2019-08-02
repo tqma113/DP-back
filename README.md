@@ -1,5 +1,7 @@
 # Welcome to dp-back 👋
 ![Version](https://img.shields.io/badge/version-1.0.0-blue.svg?cacheSeconds=2592000)
+![Prerequisite](https://img.shields.io/badge/npm-%3E%3D6.9.0-blue.svg)
+![Prerequisite](https://img.shields.io/badge/node-%3E%3D10.16.0-blue.svg)
 [![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](https://github.com/Monsooon/DP-back#readme)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/Monsooon/DP-back/graphs/commit-activity)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Monsooon/DP-back/blob/master/LICENSE)
@@ -7,6 +9,11 @@
 > Diploma project of myself. The back-end of web project.
 
 ### 🏠 [Homepage](https://github.com/Monsooon/DP-back#readme)
+
+## Prerequisites
+
+- npm >=6.9.0
+- node >=10.16.0
 
 ## Install
 

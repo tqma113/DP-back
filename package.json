@@ -32,7 +32,8 @@
     "start": "nodemon src/app.js",
     "nodemon:start": "lsof -i :4000 | grep node | grep -v grep | awk '{print $2}' | xargs kill -9&&nodemon --exec babel-node -- src/app.js",
     "babel:start": "babel-node ./src/app.js",
-    "pm2:start": "pm2 start --watch ./src/index.js"
+    "pm2:start": "pm2 start --watch ./src/index.js",
+    "build": ""
   },
   "repository": {
     "type": "git",
@@ -49,5 +50,9 @@
   "bugs": {
     "url": "https://github.com/Monsooon/DP-back/issues"
   },
-  "homepage": "https://github.com/Monsooon/DP-back#readme"
+  "homepage": "https://github.com/Monsooon/DP-back#readme",
+  "engines": {
+    "npm": ">=6.9.0",
+    "node": ">=10.16.0"
+  }
 }
