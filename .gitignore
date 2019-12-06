@@ -23,3 +23,5 @@ yarn-error.log*
 
 # static
 # /src/public/
+
+lib

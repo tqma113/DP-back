@@ -26,15 +26,16 @@
     "babel-cli": "^6.26.0",
     "babel-core": "^6.26.3",
     "babel-node": "0.0.1-security",
-    "babel-preset-env": "^1.7.0"
+    "babel-preset-env": "^1.7.0",
+    "fs-extra": "^8.1.0"
   },
   "scripts": {
     "test": "nodemon --exec babel-node -- src/test.js",
     "start": "nodemon src/app.js",
     "nodemon:start": "lsof -i :4000 | grep node | grep -v grep | awk '{print $2}' | xargs kill -9&&nodemon --exec babel-node -- src/app.js",
-    "babel:start": "babel-node ./src/app.js",
-    "pm2:start": "pm2 start --watch ./src/index.js",
-    "build": ""
+    "pm2:start": "pm2 start ./lib/app.js",
+    "prebuild": "node cp.js",
+    "build": "babel src -d lib"
   },
   "repository": {
     "type": "git",
